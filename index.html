@@ -1,0 +1,2398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zero Loss Consulting — Performance. Systems. Growth.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+/* ─────────────────────────────────────────
+   TOKENS
+───────────────────────────────────────── */
+:root {
+  --deep: #04090F;
+  --navy: #0B1E3F;
+  --navy-2: #0f2444;
+  --blue: #1B7FE0;
+  --cyan: #38AAFF;
+  --white: #FFFFFF;
+  --off: #F0F3F8;
+  --body-text: #E2E8F0;
+  --muted: #94A3B8;
+  --subtle: #475569;
+  --border-d: rgba(255,255,255,0.07);
+  --border-l: rgba(11,30,63,0.1);
+  --r: 12px;
+  --r-lg: 18px;
+  --ease-out: cubic-bezier(0.16,1,0.3,1);
+  --ease-in-out: cubic-bezier(0.4,0,0.2,1);
+}
+
+/* ─────────────────────────────────────────
+   RESET
+───────────────────────────────────────── */
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Poppins', sans-serif;
+  background: var(--deep);
+  color: var(--body-text);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  cursor: auto;
+}
+body.custom-cursor { cursor: none; }
+
+/* ─────────────────────────────────────────
+   CUSTOM CURSOR
+───────────────────────────────────────── */
+.cursor {
+  position: fixed; z-index: 9999; pointer-events: none;
+  top: 0; left: 0;
+}
+.cursor-dot {
+  width: 6px; height: 6px; background: var(--blue);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: transform 0.1s, width 0.3s, height 0.3s, background 0.3s;
+}
+.cursor-ring {
+  width: 32px; height: 32px;
+  border: 1px solid rgba(27,127,224,0.5);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: transform 0.12s var(--ease-out), width 0.4s var(--ease-out), height 0.4s var(--ease-out), border-color 0.3s;
+  position: absolute; top: 0; left: 0;
+}
+body.cursor-hover .cursor-ring {
+  width: 56px; height: 56px;
+  border-color: rgba(27,127,224,0.8);
+}
+body.cursor-hover .cursor-dot { background: var(--cyan); }
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 4px;
+}
+
+/* ─────────────────────────────────────────
+   NOISE OVERLAY
+───────────────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 1; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.025;
+}
+
+/* ─────────────────────────────────────────
+   TYPOGRAPHY
+───────────────────────────────────────── */
+.t-hero {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(72px, 10vw, 160px);
+  letter-spacing: 0.01em;
+  line-height: 0.88;
+  color: #fff;
+  -webkit-text-stroke: 1.5px #fff;
+}
+.t-hero .out {
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--blue);
+}
+.t-section {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(56px, 6.5vw, 104px);
+  letter-spacing: 0.01em;
+  line-height: 0.91;
+  color: var(--navy);
+  -webkit-text-stroke: 1px var(--navy);
+}
+.t-section.light {
+  color: #fff;
+  -webkit-text-stroke: 1px #fff;
+}
+.eyebrow {
+  font-size: 10px; font-weight: 600;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--blue); margin-bottom: 14px;
+  display: flex; align-items: center; gap: 10px;
+}
+.eyebrow::before {
+  content: ''; display: block;
+  width: 24px; height: 1px; background: var(--blue);
+}
+.eyebrow.light { color: var(--cyan); }
+.eyebrow.light::before { background: var(--cyan); }
+
+/* ─────────────────────────────────────────
+   LAYOUT
+───────────────────────────────────────── */
+.container { max-width: 1200px; margin: 0 auto; padding: 0 52px; }
+section { padding: 100px 0; position: relative; }
+
+/* ─────────────────────────────────────────
+   SCROLL ANIMATIONS
+───────────────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s var(--ease-out), transform 0.8s var(--ease-out);
+}
+.reveal.up { transform: translateY(40px); }
+.reveal.left { transform: translateX(-40px); }
+.reveal.right { transform: translateX(40px); }
+.reveal.scale { transform: scale(0.94); }
+.reveal.visible { opacity: 1; transform: none; }
+.delay-1 { transition-delay: 0.1s; }
+.delay-2 { transition-delay: 0.2s; }
+.delay-3 { transition-delay: 0.3s; }
+.delay-4 { transition-delay: 0.4s; }
+.delay-5 { transition-delay: 0.5s; }
+
+/* ─────────────────────────────────────────
+   BUTTONS
+───────────────────────────────────────── */
+.btn {
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px; font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 13px 26px;
+  border-radius: 6px; border: none;
+  cursor: pointer; display: inline-flex;
+  align-items: center; gap: 8px;
+  position: relative; overflow: hidden;
+  transition: transform 0.3s var(--ease-out), box-shadow 0.3s;
+  text-decoration: none;
+}
+.btn::after {
+  content: ''; position: absolute;
+  inset: 0; background: rgba(255,255,255,0);
+  transition: background 0.3s;
+}
+.btn:hover::after { background: rgba(255,255,255,0.08); }
+.btn:hover { transform: translateY(-2px); }
+.btn:active { transform: translateY(0); }
+.btn-primary {
+  background: var(--blue); color: #fff;
+  box-shadow: 0 4px 24px rgba(27,127,224,0.3);
+}
+.btn-primary:hover { box-shadow: 0 8px 32px rgba(27,127,224,0.45); }
+.btn-ghost {
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.7);
+  border: 0.5px solid rgba(255,255,255,0.18);
+}
+.btn-ghost:hover { color: #fff; border-color: rgba(255,255,255,0.4); }
+.btn-outline-blue {
+  background: transparent; color: var(--cyan);
+  border: 1px solid rgba(56,170,255,0.4);
+}
+.btn-outline-blue:hover { border-color: var(--cyan); background: rgba(56,170,255,0.06); }
+
+/* ─────────────────────────────────────────
+   NAV
+───────────────────────────────────────── */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: 62px; display: flex; align-items: center;
+  transition: background 0.4s, border-color 0.4s, backdrop-filter 0.4s;
+}
+.nav.scrolled {
+  background: rgba(4,9,15,0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 0.5px solid var(--border-d);
+}
+.nav-inner {
+  max-width: 1200px; margin: 0 auto; padding: 0 52px;
+  width: 100%; display: flex; align-items: center; justify-content: space-between;
+}
+.nav-logo { display: flex; align-items: center; gap: 0; text-decoration: none; }
+.nav-logo-t {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 19px; letter-spacing: 0.07em;
+  color: #fff; line-height: 1;
+  -webkit-text-stroke: 0.8px #fff;
+}
+.nav-logo-t small {
+  display: block; font-family: 'Poppins', sans-serif;
+  -webkit-text-stroke: 0;
+  font-size: 8px; font-weight: 500;
+  letter-spacing: 0.22em; color: var(--cyan); margin-top: 2px;
+}
+.nav-links { display: flex; gap: 32px; }
+.nav-link {
+  font-size: 11px; font-weight: 500;
+  color: rgba(255,255,255,0.4);
+  text-decoration: none; letter-spacing: 0.02em;
+  transition: color 0.2s; position: relative;
+}
+.nav-link::after {
+  content: ''; position: absolute;
+  bottom: -3px; left: 0; right: 0;
+  height: 1px; background: var(--blue);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 0.3s var(--ease-out);
+}
+.nav-link:hover, .nav-link.active { color: #fff; }
+.nav-link:hover::after, .nav-link.active::after { transform: scaleX(1); }
+.nav-right { display: flex; gap: 10px; align-items: center; }
+.nav-lang {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.14em;
+  color: rgba(255,255,255,0.4);
+  border: 0.5px solid rgba(255,255,255,0.15);
+  border-radius: 20px; padding: 4px 13px;
+  cursor: pointer; background: transparent;
+  font-family: 'Poppins', sans-serif;
+  transition: all 0.2s;
+}
+.nav-lang:hover { color: #fff; border-color: rgba(255,255,255,0.4); }
+
+/* ─────────────────────────────────────────
+   HERO
+───────────────────────────────────────── */
+.hero {
+  min-height: 100vh; background: var(--deep);
+  position: relative; overflow: hidden;
+  display: flex; flex-direction: column; justify-content: center;
+  padding-top: 62px;
+}
+/* Animated grid */
+.hero-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(27,127,224,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(27,127,224,0.06) 1px, transparent 1px);
+  background-size: 80px 80px;
+  animation: grid-drift 20s linear infinite;
+  transform-origin: center;
+}
+@keyframes grid-drift {
+  0% { transform: perspective(600px) rotateX(8deg) translateY(0); }
+  100% { transform: perspective(600px) rotateX(8deg) translateY(80px); }
+}
+/* Glow orbs */
+.hero-orb {
+  position: absolute; border-radius: 50%;
+  filter: blur(120px); pointer-events: none;
+}
+.hero-orb-1 {
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(27,127,224,0.18) 0%, transparent 70%);
+  top: -10%; right: -5%;
+  animation: orb-float 8s ease-in-out infinite;
+}
+.hero-orb-2 {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(56,170,255,0.1) 0%, transparent 70%);
+  bottom: 10%; left: 5%;
+  animation: orb-float 12s ease-in-out infinite reverse;
+}
+@keyframes orb-float {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-30px) scale(1.05); }
+}
+/* Diagonal accent line */
+.hero-line {
+  position: absolute;
+  width: 1px; height: 200px;
+  background: linear-gradient(to bottom, transparent, var(--blue), transparent);
+  right: 18%; top: 20%;
+  animation: line-pulse 3s ease-in-out infinite;
+}
+@keyframes line-pulse {
+  0%, 100% { opacity: 0.3; transform: scaleY(1); }
+  50% { opacity: 0.8; transform: scaleY(1.2); }
+}
+.hero-content {
+  position: relative; z-index: 2;
+  max-width: 1200px; margin: 0 auto; padding: 0 52px;
+  display: grid; grid-template-columns: 1.25fr 0.75fr;
+  gap: 60px; align-items: center;
+  padding-top: 40px; padding-bottom: 60px;
+}
+.hero-eyebrow-row {
+  display: flex; align-items: center;
+  justify-content: space-between; margin-bottom: 24px;
+}
+.hero-eyebrow-tag {
+  font-size: 10px; font-weight: 600;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--blue); display: flex; align-items: center; gap: 10px;
+}
+.hero-eyebrow-tag::before {
+  content: ''; width: 20px; height: 1px; background: var(--blue);
+}
+.hero-doc-pill {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 10px; font-weight: 500;
+  color: rgba(255,255,255,0.5);
+  border: 0.5px solid rgba(255,255,255,0.15);
+  border-radius: 20px; padding: 5px 14px;
+  cursor: pointer; text-decoration: none;
+  transition: all 0.3s;
+  background: rgba(255,255,255,0.03);
+}
+.hero-doc-pill:hover {
+  color: #fff; border-color: rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.06);
+}
+.hero-doc-pulse {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--blue); position: relative;
+}
+.hero-doc-pulse::after {
+  content: ''; position: absolute; inset: -3px;
+  border-radius: 50%; background: rgba(27,127,224,0.3);
+  animation: pulse-ring 2s ease-out infinite;
+}
+@keyframes pulse-ring {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+.hero-h { margin-bottom: 22px; }
+
+/* Char animation */
+.hero-h .char {
+  display: inline-block;
+  animation: char-in 0.6s var(--ease-out) both;
+}
+@keyframes char-in {
+  from { opacity: 0; transform: translateY(30px) rotate(3deg); }
+  to { opacity: 1; transform: none; }
+}
+
+.hero-sub {
+  font-size: 14px; line-height: 1.8;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 14px; max-width: 520px;
+}
+.hero-proof {
+  font-size: 12px; font-weight: 600; color: var(--blue);
+  border-left: 2px solid var(--blue);
+  padding-left: 14px; margin-bottom: 32px; line-height: 1.6;
+}
+.hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+.hero-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.hero-stat {
+  background: rgba(255,255,255,0.04);
+  border: 0.5px solid var(--border-d);
+  border-radius: var(--r); padding: 22px 20px;
+  position: relative; overflow: hidden;
+  transition: background 0.3s, border-color 0.3s, transform 0.3s var(--ease-out);
+}
+.hero-stat:hover {
+  background: rgba(255,255,255,0.07);
+  border-color: rgba(27,127,224,0.3);
+  transform: translateY(-3px);
+}
+.hero-stat::before {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--blue), transparent);
+  opacity: 0; transition: opacity 0.3s;
+}
+.hero-stat:hover::before { opacity: 1; }
+.hs-n {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 44px; letter-spacing: 0.01em; line-height: 0.9;
+  color: #fff; -webkit-text-stroke: 1.5px #fff;
+  display: flex; align-items: baseline; gap: 2px;
+}
+.hs-n .accent { color: var(--cyan); -webkit-text-stroke: 1.5px var(--cyan); font-size: 32px; }
+.hs-l { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 8px; line-height: 1.4; }
+/* Counter animation */
+.counter { display: inline-block; }
+
+.hero-scroll-indicator {
+  position: absolute; bottom: 36px; left: 52px;
+  display: flex; align-items: center; gap: 14px; z-index: 2;
+}
+.scroll-line-wrap {
+  width: 1px; height: 48px;
+  background: rgba(255,255,255,0.1);
+  position: relative; overflow: hidden;
+}
+.scroll-line-inner {
+  position: absolute; top: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(to bottom, transparent, var(--blue));
+  animation: scroll-slide 2s ease-in-out infinite;
+}
+@keyframes scroll-slide {
+  0% { top: -100%; } 100% { top: 100%; }
+}
+.scroll-text {
+  font-size: 9px; font-weight: 600; letter-spacing: 0.18em;
+  text-transform: uppercase; color: rgba(255,255,255,0.25);
+  writing-mode: vertical-rl;
+}
+
+/* ─────────────────────────────────────────
+   TICKER
+───────────────────────────────────────── */
+.ticker {
+  background: var(--blue); padding: 11px 0;
+  overflow: hidden; position: relative; z-index: 2;
+}
+.ticker-wrap { display: flex; }
+.ticker-track {
+  display: flex; gap: 0; white-space: nowrap;
+  animation: ticker-move 25s linear infinite;
+}
+.ticker-track:hover { animation-play-state: paused; }
+@keyframes ticker-move {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.ticker-item {
+  display: flex; align-items: center; gap: 12px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.1em;
+  text-transform: uppercase; color: rgba(255,255,255,0.85);
+  padding: 0 32px;
+}
+.ticker-dot { width: 4px; height: 4px; border-radius: 50%; background: rgba(255,255,255,0.4); }
+
+/* ─────────────────────────────────────────
+   SECTION DIVIDERS
+───────────────────────────────────────── */
+.divider {
+  width: 40px; height: 3px;
+  background: var(--blue); border-radius: 2px;
+  margin: 16px 0 32px;
+}
+.divider.light { background: var(--cyan); }
+
+/* ─────────────────────────────────────────
+   PROBLEM SECTION
+───────────────────────────────────────── */
+.problem { background: #fff; }
+.problem .container {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 80px; align-items: center;
+}
+.prob-body { font-size: 14px; color: #4B5563; line-height: 1.85; margin-bottom: 18px; }
+.prob-close { font-size: 15px; font-weight: 600; color: var(--navy); }
+.prob-items { display: flex; flex-direction: column; gap: 10px; }
+.prob-item {
+  background: var(--off);
+  border-left: 2px solid transparent;
+  border-radius: 0 var(--r) var(--r) 0;
+  padding: 16px 20px;
+  font-size: 13px; color: #374151; line-height: 1.65;
+  transition: border-color 0.3s, background 0.3s, transform 0.3s var(--ease-out);
+  cursor: default;
+}
+.prob-item:hover {
+  border-color: var(--blue);
+  background: #e8ecf5;
+  transform: translateX(4px);
+}
+
+/* ─────────────────────────────────────────
+   PHOTO BAND
+───────────────────────────────────────── */
+.photo-band {
+  display: grid; grid-template-columns: 2fr 1fr 1fr;
+  height: 300px; overflow: hidden;
+}
+.photo-cell {
+  position: relative; overflow: hidden;
+  border-right: 0.5px solid rgba(255,255,255,0.05);
+  cursor: pointer;
+}
+.photo-cell:last-child { border-right: none; }
+.photo-cell-bg {
+  width: 100%; height: 100%;
+  background-size: cover; background-position: center;
+  transition: transform 0.7s var(--ease-out);
+}
+.photo-cell:hover .photo-cell-bg { transform: scale(1.07); }
+.photo-cell-1 .photo-cell-bg { background-image: url('assets/zero-loss-logo.png'); background-size: cover; background-position: center; }
+.photo-cell-2 .photo-cell-bg { background-image: url('assets/zero-loss-image-2.png'); background-size: cover; background-position: center top; }
+.photo-cell-3 .photo-cell-bg { background-image: url('assets/zero-loss-image-3.png'); background-size: cover; background-position: center; }
+.photo-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(4,9,15,0.95) 0%, rgba(4,9,15,0.2) 60%, transparent 100%);
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 22px 24px;
+  transition: background 0.4s;
+}
+.photo-cell:hover .photo-overlay {
+  background: linear-gradient(to top, rgba(4,9,15,0.98) 0%, rgba(27,127,224,0.15) 100%);
+}
+.photo-ph {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 8px; opacity: 0.18;
+}
+.photo-ph-box { width: 32px; height: 32px; border: 1.5px solid rgba(255,255,255,0.6); border-radius: 6px; }
+.photo-ph-txt { font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; color: #fff; }
+.photo-cap { font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.85); line-height: 1.4; }
+.photo-sub { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 3px; }
+
+/* ─────────────────────────────────────────
+   SERVICES / BUILD
+───────────────────────────────────────── */
+.build { background: var(--off); }
+.poles { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 6px; }
+.pole {
+  background: #fff;
+  border: 0.5px solid var(--border-l);
+  border-radius: var(--r-lg); padding: 30px;
+  position: relative; overflow: hidden;
+  transition: transform 0.4s var(--ease-out), box-shadow 0.4s, border-color 0.3s;
+  cursor: default;
+}
+.pole::before {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--blue), var(--cyan));
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 0.4s var(--ease-out);
+}
+.pole:hover { transform: translateY(-5px); box-shadow: 0 16px 48px rgba(11,30,63,0.12); }
+.pole:hover::before { transform: scaleX(1); }
+.pole-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 13px; color: var(--blue); opacity: 0.4;
+  margin-bottom: 10px; letter-spacing: 0.1em;
+}
+.pole-icon {
+  width: 40px; height: 40px; background: #EFF6FF;
+  border-radius: 10px; display: flex; align-items: center;
+  justify-content: center; margin-bottom: 14px;
+  transition: background 0.3s, transform 0.3s;
+}
+.pole:hover .pole-icon { background: var(--blue); transform: scale(1.08); }
+.pole:hover .pole-icon svg { stroke: #fff; }
+.pole-title {
+  font-family: 'Bebas Neue', sans-serif;
+  -webkit-text-stroke: 0.7px var(--navy);
+  font-size: 22px; letter-spacing: 0.03em; line-height: 0.92;
+  color: var(--navy); margin-bottom: 10px;
+}
+.pole-desc { font-size: 12px; color: var(--subtle); line-height: 1.7; }
+.pole-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+.ptag {
+  font-size: 10px; font-weight: 500; color: var(--blue);
+  background: #EFF6FF; border-radius: 20px; padding: 3px 10px;
+  transition: background 0.2s, color 0.2s;
+}
+.pole:hover .ptag { background: rgba(27,127,224,0.1); }
+
+/* ─────────────────────────────────────────
+   PROOF / IMPACT
+───────────────────────────────────────── */
+.proof-section { background: var(--deep); overflow: hidden; }
+.proof-section::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 50%, rgba(27,127,224,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+.proof-nums {
+  display: grid; grid-template-columns: repeat(4,1fr);
+  border: 0.5px solid var(--border-d);
+  border-radius: var(--r-lg); overflow: hidden;
+  margin-bottom: 40px; position: relative;
+}
+.proof-nums::before {
+  content: ''; position: absolute;
+  inset: 0; background: rgba(27,127,224,0.03);
+  pointer-events: none;
+}
+.proof-card {
+  padding: 36px 20px; text-align: center;
+  border-right: 0.5px solid var(--border-d);
+  position: relative; transition: background 0.3s;
+}
+.proof-card:last-child { border-right: none; }
+.proof-card:hover { background: rgba(27,127,224,0.05); }
+.proof-n {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(48px, 5.5vw, 80px);
+  letter-spacing: 0.01em; line-height: 0.9;
+  color: #fff; -webkit-text-stroke: 1.5px #fff;
+}
+.proof-n .c { color: var(--cyan); -webkit-text-stroke: 1.5px var(--cyan); }
+.proof-l { font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 10px; line-height: 1.5; }
+.clients-lbl {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.16em;
+  text-transform: uppercase; color: rgba(255,255,255,0.2); margin-bottom: 14px;
+}
+.clients { display: flex; flex-wrap: wrap; gap: 9px; }
+.client {
+  font-size: 12px; font-weight: 500;
+  color: rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.04);
+  border: 0.5px solid rgba(255,255,255,0.09);
+  border-radius: 20px; padding: 6px 16px;
+  transition: all 0.25s;
+}
+.client:hover {
+  background: rgba(27,127,224,0.12);
+  border-color: rgba(27,127,224,0.3);
+  color: rgba(255,255,255,0.85);
+  transform: translateY(-1px);
+}
+
+/* ─────────────────────────────────────────
+   DOCUMENTARY
+───────────────────────────────────────── */
+.doc-section { background: var(--deep); padding: 0; }
+.doc-bar {
+  padding: 14px 52px;
+  border-top: 0.5px solid var(--border-d);
+  border-bottom: 0.5px solid var(--border-d);
+  display: flex; justify-content: space-between; align-items: center;
+  max-width: 100%;
+}
+.doc-meta { display: flex; align-items: center; gap: 16px; }
+.doc-mi { font-size: 10px; color: rgba(255,255,255,0.22); display: flex; align-items: center; gap: 8px; }
+.doc-ms { width: 3px; height: 3px; border-radius: 50%; background: rgba(255,255,255,0.15); }
+.doc-header {
+  max-width: 1200px; margin: 0 auto; padding: 64px 52px 40px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: end;
+}
+.doc-h {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(56px, 6.5vw, 104px);
+  letter-spacing: 0.01em; line-height: 0.91;
+  color: #fff; -webkit-text-stroke: 1.5px #fff;
+}
+.doc-h em { color: transparent; -webkit-text-stroke: 1.5px var(--blue); font-style: normal; }
+.doc-body { font-size: 14px; color: rgba(255,255,255,0.45); line-height: 1.8; margin-bottom: 20px; }
+.doc-credits {
+  display: flex; flex-direction: column; gap: 6px;
+  margin-bottom: 26px;
+  border-left: 2px solid rgba(27,127,224,0.3);
+  padding-left: 16px;
+}
+.doc-credit { font-size: 11px; color: rgba(255,255,255,0.28); }
+.doc-credit strong { color: rgba(255,255,255,0.6); font-weight: 500; }
+
+/* Player */
+.doc-player-wrap { max-width: 1200px; margin: 0 auto; padding: 0 52px 40px; }
+.doc-player {
+  border-radius: var(--r-lg); overflow: hidden;
+  position: relative;
+  box-shadow: 0 32px 80px rgba(4,9,15,0.8);
+  transition: transform 0.4s var(--ease-out), box-shadow 0.4s;
+}
+.doc-player:hover { transform: translateY(-4px); box-shadow: 0 48px 100px rgba(4,9,15,0.9); }
+.doc-player-inner {
+  width: 100%; aspect-ratio: 16/9;
+  background: linear-gradient(135deg,#060F20 0%,#0d1f3c 45%,#091728 100%);
+  position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden;
+}
+.doc-grid-bg {
+  position: absolute; inset: 0;
+  background-image:
+    repeating-linear-gradient(90deg, rgba(27,127,224,0.05) 0, rgba(27,127,224,0.05) 1px, transparent 1px, transparent 120px),
+    repeating-linear-gradient(0deg, rgba(27,127,224,0.05) 0, rgba(27,127,224,0.05) 1px, transparent 1px, transparent 80px);
+}
+.doc-scan {
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 4px);
+  pointer-events: none;
+}
+.doc-edge-l { position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: linear-gradient(to bottom, transparent, var(--blue), transparent); }
+.doc-edge-r { position: absolute; right: 0; top: 0; bottom: 0; width: 3px; background: linear-gradient(to bottom, transparent, var(--blue), transparent); }
+.doc-corner { position: absolute; width: 20px; height: 20px; }
+.doc-corner.tl { top: 16px; left: 16px; border-top: 1.5px solid rgba(27,127,224,0.6); border-left: 1.5px solid rgba(27,127,224,0.6); }
+.doc-corner.tr { top: 16px; right: 16px; border-top: 1.5px solid rgba(27,127,224,0.6); border-right: 1.5px solid rgba(27,127,224,0.6); }
+.doc-corner.bl { bottom: 50px; left: 16px; border-bottom: 1.5px solid rgba(27,127,224,0.6); border-left: 1.5px solid rgba(27,127,224,0.6); }
+.doc-corner.br { bottom: 50px; right: 16px; border-bottom: 1.5px solid rgba(27,127,224,0.6); border-right: 1.5px solid rgba(27,127,224,0.6); }
+.doc-center {
+  position: relative; display: flex; flex-direction: column;
+  align-items: center; gap: 16px; z-index: 1;
+}
+.doc-ytag {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--blue); background: rgba(27,127,224,0.15);
+  padding: 4px 14px; border-radius: 20px;
+}
+.doc-ring {
+  width: 76px; height: 76px; border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  position: relative; cursor: pointer;
+  transition: all 0.3s var(--ease-out);
+}
+.doc-ring::before {
+  content: ''; position: absolute; inset: -8px;
+  border-radius: 50%; border: 0.5px solid rgba(27,127,224,0.2);
+  transition: all 0.3s;
+}
+.doc-ring::after {
+  content: ''; position: absolute; inset: -16px;
+  border-radius: 50%; border: 0.5px solid rgba(27,127,224,0.1);
+}
+.doc-ring:hover { border-color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.06); transform: scale(1.1); }
+.doc-tri { width: 0; height: 0; border-top: 14px solid transparent; border-bottom: 14px solid transparent; border-left: 22px solid rgba(255,255,255,0.9); margin-left: 6px; }
+.doc-player-title { font-size: 13px; font-weight: 400; font-style: italic; color: rgba(255,255,255,0.45); text-align: center; max-width: 340px; line-height: 1.6; }
+.doc-ctrl {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 12px 20px;
+  background: linear-gradient(to top, rgba(4,9,15,0.95), transparent);
+  display: flex; align-items: center; gap: 12px;
+}
+.doc-ctrl-btn {
+  width: 24px; height: 24px; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.25);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; cursor: pointer; transition: all 0.2s;
+}
+.doc-ctrl-btn:hover { border-color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.08); }
+.doc-ctrl-tri { width: 0; height: 0; border-top: 4px solid transparent; border-bottom: 4px solid transparent; border-left: 7px solid rgba(255,255,255,0.8); margin-left: 2px; }
+.doc-prog { flex: 1; height: 3px; background: rgba(255,255,255,0.1); border-radius: 2px; cursor: pointer; overflow: hidden; position: relative; }
+.doc-prog:hover { height: 5px; }
+.doc-prog-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--blue), var(--cyan)); border-radius: 2px; transition: width 0.1s; }
+.doc-time { font-size: 10px; color: rgba(255,255,255,0.35); flex-shrink: 0; font-variant-numeric: tabular-nums; }
+
+/* ─────────────────────────────────────────
+   WHO WE WORK WITH
+───────────────────────────────────────── */
+.who { background: #fff; }
+.who-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.who-card {
+  background: var(--off);
+  border: 0.5px solid var(--border-l);
+  border-radius: var(--r-lg); padding: 26px;
+  transition: all 0.4s var(--ease-out); cursor: default;
+  position: relative; overflow: hidden;
+}
+.who-card::after {
+  content: ''; position: absolute;
+  bottom: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--blue), var(--cyan));
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 0.4s var(--ease-out);
+}
+.who-card:hover { box-shadow: 0 12px 40px rgba(11,30,63,0.1); transform: translateY(-4px); background: #fff; }
+.who-card:hover::after { transform: scaleX(1); }
+.who-badge {
+  font-size: 9px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--blue); background: #EFF6FF;
+  display: inline-block; padding: 3px 11px; border-radius: 20px; margin-bottom: 12px;
+}
+.who-text { font-size: 13px; color: #4B5563; line-height: 1.72; }
+
+/* ─────────────────────────────────────────
+   HOW IT WORKS
+───────────────────────────────────────── */
+.how { background: var(--off); }
+.steps {
+  display: grid; grid-template-columns: repeat(4,1fr);
+  border: 0.5px solid var(--border-l);
+  border-radius: var(--r-lg); overflow: hidden;
+  margin-top: 6px;
+}
+.step { padding: 30px 22px; background: #fff; position: relative; overflow: hidden; }
+.step + .step { border-left: 0.5px solid var(--border-l); }
+.step::before {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--blue), var(--cyan));
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 0.4s var(--ease-out);
+}
+.step:hover::before { transform: scaleX(1); }
+.step:hover { background: #f8faff; }
+.step-n {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 38px; letter-spacing: 0.01em; line-height: 0.9;
+  color: var(--blue); opacity: 0.25; margin-bottom: 14px;
+  transition: opacity 0.3s;
+}
+.step:hover .step-n { opacity: 0.5; }
+.step-t {
+  font-family: 'Bebas Neue', sans-serif;
+  -webkit-text-stroke: 0.7px var(--navy);
+  font-size: 22px; letter-spacing: 0.03em; line-height: 0.92;
+  color: var(--navy); margin-bottom: 10px;
+}
+.step-d { font-size: 12px; color: var(--subtle); line-height: 1.65; }
+
+/* ─────────────────────────────────────────
+   PROJECT GRID + CASE STUDY MODAL
+───────────────────────────────────────── */
+.project-grid-sec { background: var(--deep); }
+.pgrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 240px 240px;
+  gap: 10px; margin-top: 32px;
+}
+.pg {
+  border-radius: var(--r); overflow: hidden;
+  position: relative; display: flex;
+  align-items: center; justify-content: center;
+  border: 0.5px solid rgba(255,255,255,0.07);
+  cursor: pointer;
+  transition: border-color 0.3s, transform 0.4s var(--ease-out), box-shadow 0.4s;
+}
+.pg.large { grid-row: 1/3; }
+.pg:hover { border-color: rgba(27,127,224,0.5); transform: scale(1.01); box-shadow: 0 20px 60px rgba(4,9,15,0.6); }
+.pg:hover .pg-img { transform: scale(1.06); }
+.pg-img {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  background-size: cover; background-position: center;
+  transition: transform 0.7s var(--ease-out);
+}
+.pg-1 .pg-img { background-image: url('assets/zero-loss-image-4.png'); background-size: cover; background-position: center; }
+.pg-2 .pg-img { background-image: url('assets/zero-loss-image-3.png'); background-size: cover; background-position: center; }
+.pg-3 .pg-img { background-image: url('assets/zero-loss-image-5.png'); background-size: cover; background-position: center; }
+.pg-4 .pg-img { background-image: url('assets/zero-loss-image-6.png'); background-size: cover; background-position: center top; }
+.pg-5 .pg-img { background-image: url('assets/zero-loss-image-7.jpg'); background-size: cover; background-position: center top; }
+.pg-ph {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 8px; opacity: 0.15;
+}
+.pg-ph-box { width: 28px; height: 28px; border: 1px solid rgba(255,255,255,0.6); border-radius: 4px; }
+.pg-ph-txt { font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: #fff; }
+.pg-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(4,9,15,0.96) 0%, rgba(4,9,15,0.3) 50%, transparent 100%);
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 20px 22px;
+  transition: background 0.4s;
+}
+.pg:hover .pg-overlay {
+  background: linear-gradient(to top, rgba(4,9,15,0.98) 0%, rgba(27,127,224,0.12) 100%);
+}
+.pg-tag {
+  font-size: 9px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--cyan); background: rgba(27,127,224,0.2);
+  display: inline-block; padding: 2px 9px; border-radius: 20px;
+  margin-bottom: 8px; width: fit-content;
+}
+.pg-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.9); }
+.pg-sub { font-size: 10px; color: rgba(255,255,255,0.38); margin-top: 3px; }
+.pg-hint {
+  font-size: 10px; font-weight: 500; color: var(--blue);
+  margin-top: 10px; opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.3s, transform 0.3s var(--ease-out);
+  display: flex; align-items: center; gap: 5px;
+}
+.pg:hover .pg-hint { opacity: 1; transform: translateY(0); }
+
+/* MODAL */
+.cs-overlay {
+  position: fixed; inset: 0; z-index: 500;
+  background: rgba(4,9,15,0.88);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.4s;
+  padding: 24px;
+}
+.cs-overlay.open { opacity: 1; pointer-events: all; }
+.cs-modal {
+  background: linear-gradient(160deg, #0f2444 0%, #0B1E3F 100%);
+  border: 0.5px solid rgba(255,255,255,0.1);
+  border-radius: var(--r-lg);
+  max-width: 780px; width: 100%;
+  max-height: 90vh; overflow-y: auto;
+  transform: translateY(32px) scale(0.97);
+  transition: transform 0.45s var(--ease-out);
+  position: relative;
+  box-shadow: 0 40px 120px rgba(4,9,15,0.9);
+}
+.cs-overlay.open .cs-modal { transform: none; }
+.cs-close {
+  position: absolute; top: 18px; right: 18px;
+  width: 34px; height: 34px; border-radius: 50%;
+  background: rgba(255,255,255,0.06); border: 0.5px solid rgba(255,255,255,0.1);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 15px; color: rgba(255,255,255,0.5); z-index: 1;
+  transition: all 0.2s; font-family: 'Poppins', sans-serif;
+}
+.cs-close:hover { background: rgba(255,255,255,0.14); color: #fff; transform: rotate(90deg); }
+.cs-hero {
+  height: 210px; position: relative; overflow: hidden;
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  display: flex; align-items: flex-end; padding: 24px 30px;
+}
+.cs-hero-bg {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center;
+}
+.cs-hero-ov { position: absolute; inset: 0; background: linear-gradient(to top, rgba(4,9,15,0.95), rgba(4,9,15,0.3)); }
+.cs-hero-c { position: relative; }
+.cs-modal-tag {
+  font-size: 9px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--cyan); background: rgba(27,127,224,0.2);
+  display: inline-block; padding: 3px 10px; border-radius: 20px; margin-bottom: 10px;
+}
+.cs-modal-title {
+  font-family: 'Bebas Neue', sans-serif;
+  -webkit-text-stroke: 1px #fff;
+  font-size: clamp(28px,4vw,48px); letter-spacing: 0.01em; line-height: 0.92; color: #fff;
+}
+.cs-body { padding: 30px; }
+.cs-client {
+  font-size: 11px; color: rgba(255,255,255,0.3);
+  margin-bottom: 26px; padding-bottom: 18px;
+  border-bottom: 0.5px solid rgba(255,255,255,0.07);
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+.cs-client span { color: rgba(255,255,255,0.65); }
+.cs-sep { width: 3px; height: 3px; border-radius: 50%; background: rgba(255,255,255,0.2); }
+.cs-lbl {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--blue); margin-bottom: 10px;
+}
+.cs-text { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.8; margin-bottom: 26px; }
+.cs-what { display: flex; flex-direction: column; gap: 8px; margin-bottom: 26px; }
+.cs-what-item {
+  font-size: 12px; color: rgba(255,255,255,0.55);
+  display: flex; align-items: flex-start; gap: 11px; line-height: 1.6;
+}
+.cs-what-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--blue); margin-top: 6px; flex-shrink: 0; }
+.cs-results { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 26px; }
+.cs-rc {
+  background: rgba(255,255,255,0.04);
+  border: 0.5px solid rgba(255,255,255,0.08);
+  border-radius: var(--r); padding: 16px 12px; text-align: center;
+  transition: background 0.3s, border-color 0.3s;
+}
+.cs-rc:hover { background: rgba(27,127,224,0.1); border-color: rgba(27,127,224,0.3); }
+.cs-rn {
+  font-family: 'Bebas Neue', sans-serif;
+  -webkit-text-stroke: 1px var(--cyan);
+  font-size: 32px; letter-spacing: 0.01em; line-height: 0.9; color: var(--cyan);
+}
+.cs-rl { font-size: 10px; color: rgba(255,255,255,0.32); margin-top: 7px; line-height: 1.4; }
+.cs-footer {
+  border-top: 0.5px solid rgba(255,255,255,0.07);
+  padding-top: 22px; display: flex;
+  justify-content: space-between; align-items: center;
+}
+.cs-footer-txt { font-size: 12px; color: rgba(255,255,255,0.3); }
+.cs-footer-txt strong { color: rgba(255,255,255,0.65); font-weight: 500; }
+
+/* ─────────────────────────────────────────
+   ECOSYSTEM / TALENT
+───────────────────────────────────────── */
+.ecosystem { background: var(--navy); overflow: hidden; }
+.ecosystem::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 100% 50%, rgba(27,127,224,0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+.talent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.tc {
+  background: rgba(255,255,255,0.04);
+  border: 0.5px solid rgba(255,255,255,0.09);
+  border-radius: var(--r-lg); padding: 36px;
+  transition: all 0.4s var(--ease-out); position: relative; overflow: hidden;
+}
+.tc::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--blue), transparent);
+  opacity: 0; transition: opacity 0.4s;
+}
+.tc:hover { background: rgba(255,255,255,0.07); border-color: rgba(27,127,224,0.2); transform: translateY(-4px); }
+.tc:hover::before { opacity: 1; }
+.tc-badge {
+  font-size: 9px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--cyan); background: rgba(27,127,224,0.15);
+  display: inline-block; padding: 3px 11px; border-radius: 20px; margin-bottom: 14px;
+}
+.tc-h {
+  font-family: 'Bebas Neue', sans-serif;
+  -webkit-text-stroke: 1px #fff;
+  font-size: clamp(36px,4.5vw,56px); letter-spacing: 0.01em; line-height: 0.91;
+  color: #fff; margin-bottom: 14px;
+}
+.tc-desc { font-size: 13px; color: rgba(255,255,255,0.45); line-height: 1.78; margin-bottom: 22px; }
+.tc-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+.ts {
+  background: rgba(255,255,255,0.05); border-radius: 10px; padding: 14px 16px;
+  transition: background 0.3s;
+}
+.tc:hover .ts { background: rgba(255,255,255,0.08); }
+.ts-n {
+  font-family: 'Bebas Neue', sans-serif;
+  -webkit-text-stroke: 1px #fff;
+  font-size: 26px; letter-spacing: 0.01em; line-height: 0.9; color: #fff;
+}
+.ts-l { font-size: 10px; color: rgba(255,255,255,0.28); margin-top: 5px; }
+.tc-link {
+  font-size: 12px; font-weight: 500; color: var(--cyan);
+  text-decoration: none; display: inline-flex; align-items: center; gap: 7px;
+  transition: gap 0.2s;
+}
+.tc-link:hover { gap: 12px; color: #fff; }
+
+/* ─────────────────────────────────────────
+   INSIGHTS
+───────────────────────────────────────── */
+.insights { background: #fff; }
+.insights-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+.ic {
+  background: var(--off);
+  border: 0.5px solid var(--border-l);
+  border-radius: var(--r-lg); overflow: hidden;
+  cursor: pointer; transition: all 0.4s var(--ease-out);
+}
+.ic:hover { box-shadow: 0 16px 48px rgba(11,30,63,0.12); transform: translateY(-5px); }
+.ic-top {
+  height: 110px;
+  background: linear-gradient(135deg, var(--navy), #0f2444);
+  position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden;
+}
+.ic-top::before {
+  content: ''; position: absolute; inset: 0;
+  background-image: repeating-linear-gradient(90deg, rgba(27,127,224,0.07) 0, rgba(27,127,224,0.07) 1px, transparent 1px, transparent 40px);
+  transition: opacity 0.3s;
+}
+.ic:hover .ic-top::before { opacity: 0.5; }
+.ic-cat {
+  position: relative;
+  font-size: 9px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--cyan); background: rgba(27,127,224,0.2);
+  padding: 3px 10px; border-radius: 20px;
+}
+.ic-body { padding: 20px; }
+.ic-title { font-size: 13px; font-weight: 500; color: var(--navy); line-height: 1.55; margin-bottom: 8px; }
+.ic-meta { font-size: 10px; color: var(--subtle); }
+.ic-read {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 500; color: var(--blue);
+  margin-top: 12px; transition: gap 0.2s;
+}
+.ic:hover .ic-read { gap: 9px; }
+
+/* ─────────────────────────────────────────
+   CTA
+───────────────────────────────────────── */
+.cta-sec {
+  background: var(--deep); text-align: center; padding: 112px 0;
+  position: relative; overflow: hidden;
+}
+.cta-sec::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 100%, rgba(27,127,224,0.12) 0%, transparent 60%);
+  pointer-events: none;
+}
+/* Animated border top */
+.cta-sec::after {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--blue), transparent);
+}
+.cta-h {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(56px, 6.5vw, 104px);
+  letter-spacing: 0.01em; line-height: 0.91;
+  color: #fff; -webkit-text-stroke: 1.5px #fff;
+  margin-bottom: 22px; position: relative;
+}
+.cta-sub {
+  font-size: 14px; color: rgba(255,255,255,0.38);
+  max-width: 440px; margin: 0 auto 38px; line-height: 1.85;
+  position: relative;
+}
+.cta-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; position: relative; }
+
+/* ─────────────────────────────────────────
+   FOOTER
+───────────────────────────────────────── */
+.footer { background: #020811; border-top: 0.5px solid rgba(255,255,255,0.05); padding: 52px 0 36px; }
+.footer-top {
+  display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr;
+  gap: 48px; margin-bottom: 48px;
+}
+.footer-brand-t {
+  font-family: 'Bebas Neue', sans-serif;
+  -webkit-text-stroke: 0.8px rgba(255,255,255,0.6);
+  font-size: 22px; letter-spacing: 0.07em; color: rgba(255,255,255,0.6);
+}
+.footer-brand-t small {
+  display: block; font-family: 'Poppins', sans-serif;
+  -webkit-text-stroke: 0; font-size: 8px; color: var(--blue);
+  letter-spacing: 0.22em; font-weight: 500; margin-top: 2px;
+}
+.footer-tag { font-size: 12px; color: rgba(255,255,255,0.22); margin-top: 14px; line-height: 1.65; }
+.footer-col-t {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+  color: rgba(255,255,255,0.2); margin-bottom: 18px;
+}
+.footer-links { display: flex; flex-direction: column; gap: 11px; }
+.footer-lk {
+  font-size: 13px; color: rgba(255,255,255,0.35);
+  text-decoration: none; transition: color 0.2s;
+}
+.footer-lk:hover { color: rgba(255,255,255,0.8); }
+.footer-ci { font-size: 12px; color: rgba(255,255,255,0.28); margin-bottom: 9px; line-height: 1.5; }
+.footer-ci a { color: inherit; text-decoration: none; transition: color 0.2s; }
+.footer-ci a:hover { color: var(--cyan); }
+.footer-bottom {
+  border-top: 0.5px solid rgba(255,255,255,0.05);
+  padding-top: 24px; display: flex;
+  justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+}
+.footer-copy { font-size: 11px; color: rgba(255,255,255,0.18); }
+.footer-btm-lks { display: flex; gap: 22px; }
+.footer-btm-lk { font-size: 11px; color: rgba(255,255,255,0.18); text-decoration: none; transition: color 0.2s; }
+.footer-btm-lk:hover { color: rgba(255,255,255,0.5); }
+
+/* ─────────────────────────────────────────
+   SCROLL TO TOP
+───────────────────────────────────────── */
+.scroll-top {
+  position: fixed; bottom: 32px; right: 32px; z-index: 50;
+  width: 44px; height: 44px; background: var(--blue);
+  border-radius: 50%; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transform: translateY(12px);
+  transition: all 0.35s var(--ease-out);
+  box-shadow: 0 6px 24px rgba(27,127,224,0.4);
+}
+.scroll-top.show { opacity: 1; transform: translateY(0); }
+.scroll-top:hover { transform: translateY(-3px); box-shadow: 0 10px 32px rgba(27,127,224,0.5); }
+.scroll-top svg { width: 16px; height: 16px; }
+
+/* ─────────────────────────────────────────
+   LANGUAGE
+───────────────────────────────────────── */
+[data-fr] { display: none; }
+body.fr [data-en] { display: none; }
+body.fr [data-fr] { display: block; }
+body.fr span[data-fr] { display: inline; }
+body.fr span[data-en] { display: none; }
+
+/* ─────────────────────────────────────────
+   LOADING SCREEN
+───────────────────────────────────────── */
+.loader {
+  position: fixed; inset: 0; z-index: 1000;
+  background: var(--deep);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px;
+  transition: opacity 0.6s, transform 0.6s var(--ease-out);
+}
+.loader.done { opacity: 0; pointer-events: none; transform: translateY(-20px); }
+.loader-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 48px; letter-spacing: 0.06em;
+  color: #fff; -webkit-text-stroke: 1px #fff;
+  overflow: hidden;
+}
+.loader-logo span {
+  display: inline-block;
+  animation: logo-reveal 0.8s var(--ease-out) both;
+}
+@keyframes logo-reveal {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+.loader-bar-wrap {
+  width: 200px; height: 2px;
+  background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden;
+}
+.loader-bar {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--blue), var(--cyan));
+  border-radius: 2px;
+  animation: load-progress 1.4s var(--ease-out) forwards;
+}
+@keyframes load-progress { to { width: 100%; } }
+.loader-sub {
+  font-size: 10px; font-weight: 500; letter-spacing: 0.2em;
+  text-transform: uppercase; color: rgba(255,255,255,0.25);
+}
+
+/* ─────────────────────────────────────────
+   PREVENT HORIZONTAL SCROLL
+───────────────────────────────────────── */
+html { overflow-x: hidden; }
+img, iframe, video { max-width: 100%; }
+
+@media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .cursor { display: none; }
+  body.custom-cursor { cursor: auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ─────────────────────────────────────────
+   TABLET — 768px
+───────────────────────────────────────── */
+@media (max-width: 768px) {
+
+  /* Base */
+  html, body { overflow-x: hidden; }
+  section { padding: 56px 0; }
+  .container { padding: 0 20px; max-width: 100%; }
+
+  /* Cursor */
+  .cursor { display: none; }
+  body { cursor: auto !important; }
+
+  /* Nav */
+  .nav-inner { padding: 0 16px; }
+  .nav-links { display: none; }
+  .nav-logo-t { font-size: 14px; }
+  .nav-lang { padding: 3px 10px; font-size: 9px; }
+  .nav-cta { font-size: 11px; padding: 7px 12px; white-space: nowrap; }
+
+  /* Hero */
+  .hero > div[style*="background-image"] {
+    background-size: cover !important;
+    background-position: center center !important;
+  }
+  .hero-content {
+    grid-template-columns: 1fr !important;
+    gap: 36px;
+    padding: 28px 20px 52px !important;
+  }
+  .t-hero { font-size: clamp(48px, 13vw, 80px) !important; line-height: 0.88; }
+  .hero-eyebrow-row { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .hero-doc-pill { align-self: flex-start; }
+  .hero-sub { font-size: 13px; max-width: 100%; }
+  .hero-proof { font-size: 12px; }
+  .hero-btns { flex-direction: column; gap: 10px; }
+  .hero-btns .btn { width: 100%; justify-content: center; }
+  .hero-stats { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .hs-n { font-size: 32px !important; -webkit-text-stroke: 1.2px #fff; }
+  .hs-n .accent { font-size: 24px !important; }
+  .hs-l { font-size: 10px; }
+  .hero-scroll-indicator { display: none; }
+
+  /* Ticker */
+  .ticker-item { padding: 0 16px; font-size: 10px; }
+
+  /* Section titles */
+  .t-section { font-size: clamp(38px, 10.5vw, 64px) !important; }
+
+  /* Problem */
+  .problem .container { grid-template-columns: 1fr !important; gap: 32px; }
+  .prob-body { font-size: 13px; }
+
+  /* Photo band */
+  .photo-band { grid-template-columns: 1fr !important; height: auto; }
+  .photo-cell { height: 210px; border-right: none !important; border-bottom: 0.5px solid rgba(255,255,255,0.06); }
+  .photo-cell:last-child { border-bottom: none; }
+
+  /* Services */
+  .poles { grid-template-columns: 1fr !important; gap: 10px; }
+  .pole { padding: 20px; }
+
+  /* Proof */
+  .proof-nums { grid-template-columns: 1fr 1fr !important; }
+  .proof-card {
+    border-right: none !important;
+    border-bottom: 0.5px solid var(--border-d) !important;
+    padding: 20px 12px;
+  }
+  .proof-card:nth-child(1),
+  .proof-card:nth-child(3) { border-right: 0.5px solid var(--border-d) !important; }
+  .proof-card:nth-child(3),
+  .proof-card:nth-child(4) { border-bottom: none !important; }
+  .proof-n { font-size: clamp(32px, 8vw, 52px) !important; }
+  .clients { gap: 7px; }
+  .client { font-size: 11px; padding: 5px 12px; }
+
+  /* Documentary */
+  .doc-bar { padding: 12px 20px; flex-direction: column; align-items: flex-start; gap: 6px; }
+  .doc-header { grid-template-columns: 1fr !important; gap: 24px; padding: 32px 20px 20px !important; }
+  .doc-h { font-size: clamp(40px, 11vw, 72px) !important; }
+  .doc-player-wrap { padding: 0 20px 20px !important; }
+
+  /* Who */
+  .who-grid { grid-template-columns: 1fr !important; gap: 10px; }
+  .who-card { padding: 18px; }
+  .who-text { font-size: 13px; }
+
+  /* How It Works */
+  .steps { grid-template-columns: 1fr 1fr !important; border-radius: var(--r); }
+  .step { padding: 18px 14px; }
+  .step + .step { border-left: none !important; }
+  .step:nth-child(1) { border-right: 0.5px solid var(--border-l) !important; }
+  .step:nth-child(2) { border-right: none !important; }
+  .step:nth-child(3) {
+    border-right: 0.5px solid var(--border-l) !important;
+    border-top: 0.5px solid var(--border-l) !important;
+  }
+  .step:nth-child(4) { border-top: 0.5px solid var(--border-l) !important; }
+  .step-n { font-size: 26px; margin-bottom: 10px; }
+  .step-t { font-size: 18px; }
+  .step-d { font-size: 11px; }
+
+  /* Project Grid */
+  .pgrid {
+    grid-template-columns: 1fr 1fr !important;
+    grid-template-rows: 180px 160px 160px !important;
+    gap: 8px;
+  }
+  .pg.large { grid-row: 1 / 2 !important; grid-column: 1 / -1 !important; height: 180px; }
+  .pg-title { font-size: 11px; }
+  .pg-sub { font-size: 9px; }
+  .pg-tag { font-size: 8px; padding: 2px 7px; }
+  .pg-hint { display: none; }
+  .pg-overlay { padding: 12px 14px; }
+
+  /* Case Study Modal */
+  .cs-overlay { padding: 12px; align-items: flex-end; }
+  .cs-modal { border-radius: 14px 14px 0 0; max-height: 88vh; }
+  .cs-hero { height: 140px; border-radius: 14px 14px 0 0; }
+  .cs-modal-title { font-size: clamp(24px, 6vw, 36px) !important; }
+  .cs-body { padding: 18px; }
+  .cs-results { grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .cs-rn { font-size: 22px; }
+  .cs-rl { font-size: 9px; }
+  .cs-footer { flex-direction: column; gap: 12px; }
+  .cs-footer .btn { width: 100%; justify-content: center; }
+
+  /* Ecosystem */
+  .talent-grid { grid-template-columns: 1fr !important; gap: 12px; }
+  .tc { padding: 22px 18px; }
+  .tc-h { font-size: clamp(30px, 8.5vw, 48px) !important; }
+  .tc-stats { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .ts-n { font-size: 20px; }
+
+  /* Insights */
+  .insights-grid { grid-template-columns: 1fr !important; gap: 10px; }
+  .ic-title { font-size: 13px; }
+
+  /* Contact — override inline grid style */
+  .cta-sec { padding: 56px 0 !important; }
+  .cta-sec > .container > div {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 36px !important;
+  }
+  #formBox { padding: 22px 18px; }
+  /* Override the inline 2-col grid for name/org fields */
+  #formBox form > div:first-child {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 14px !important;
+  }
+  #contactForm input,
+  #contactForm select,
+  #contactForm textarea { font-size: 16px !important; } /* prevent iOS zoom */
+
+  /* Footer */
+  .footer { padding: 40px 0 28px; }
+  .footer-top { grid-template-columns: 1fr 1fr !important; gap: 24px; }
+  .footer-col-t { font-size: 9px; margin-bottom: 12px; }
+  .footer-lk { font-size: 12px; }
+  .footer-ci { font-size: 11px; }
+  .footer-bottom { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .footer-copy, .footer-btm-lk { font-size: 10px; }
+
+  /* Scroll top */
+  .scroll-top { bottom: 18px; right: 18px; width: 36px; height: 36px; }
+}
+
+/* ─────────────────────────────────────────
+   MOBILE — 480px
+───────────────────────────────────────── */
+@media (max-width: 480px) {
+
+  .container { padding: 0 16px; }
+  .t-section { font-size: clamp(34px, 9.5vw, 52px) !important; }
+  .t-hero { font-size: clamp(42px, 12vw, 64px) !important; }
+
+  /* Nav */
+  .nav-logo img { height: 20px !important; }
+  .nav-cta { font-size: 10px; padding: 6px 10px; }
+
+  /* Hero */
+  .hs-n { font-size: 28px !important; }
+  .hero-proof { font-size: 11px; }
+
+  /* Steps → single column */
+  .steps { grid-template-columns: 1fr !important; }
+  .step:nth-child(1) { border-right: none !important; }
+  .step:nth-child(3) { border-right: none !important; }
+  .step + .step { border-top: 0.5px solid var(--border-l) !important; }
+
+  /* Project grid → single column */
+  .pgrid {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto !important;
+    gap: 8px;
+  }
+  .pg, .pg.large { height: 200px !important; grid-row: auto !important; grid-column: auto !important; }
+
+  /* Proof → 2 col kept */
+  .proof-n { font-size: clamp(28px, 7vw, 44px) !important; }
+
+  /* Footer → single column */
+  .footer-top { grid-template-columns: 1fr !important; gap: 20px; }
+  .footer-btm-lks { gap: 14px; }
+
+  /* Contact form fields */
+  #formBox form > div:first-child {
+    flex-direction: column !important;
+  }
+
+  /* Modal full screen feel */
+  .cs-overlay { padding: 0; align-items: flex-end; }
+  .cs-modal { border-radius: 16px 16px 0 0; max-height: 92vh; }
+  .cs-results { grid-template-columns: 1fr 1fr 1fr !important; }
+}
+
+/* Footer mobile */
+@media (max-width: 768px) {
+  .footer-links-grid { grid-template-columns: 1fr 1fr !important; gap: 24px !important; }
+  footer > div:nth-child(2) > div { padding: 40px 20px 0 !important; }
+  footer > div:last-child > div { padding: 16px 20px !important; }
+  footer > div:nth-child(2) > div > div:first-child {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 20px !important;
+    margin-bottom: 32px !important;
+    padding-bottom: 28px !important;
+  }
+  footer > div:nth-child(2) > div > div:first-child > div:last-child { text-align: left !important; }
+  footer > div:last-child > div { flex-direction: column !important; align-items: flex-start !important; gap: 6px !important; }
+}
+@media (max-width: 480px) {
+  .footer-links-grid { grid-template-columns: 1fr !important; gap: 20px !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div class="loader" id="loader">
+  <img src="assets/zero-loss-image-8.png" alt="Zero Loss Consulting" style="height:44px;width:auto;mix-blend-mode:screen;animation:logo-reveal 0.8s cubic-bezier(0.16,1,0.3,1) both;">
+  <div class="loader-bar-wrap"><div class="loader-bar"></div></div>
+  <div class="loader-sub">Performance. Systems. Growth.</div>
+</div>
+
+<!-- CURSOR -->
+<div class="cursor" id="cursor">
+  <div class="cursor-ring" id="cursorRing"></div>
+  <div class="cursor-dot" id="cursorDot"></div>
+</div>
+
+<!-- SCROLL TO TOP -->
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Scroll to top">
+  <svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round">
+    <path d="M8 12V4M4 7l4-4 4 4"/>
+  </svg>
+</button>
+
+<!-- ─── NAV ─── -->
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="#home" class="nav-logo" aria-label="Zero Loss Consulting home">
+      <img src="assets/zero-loss-image-8.png" alt="Zero Loss Consulting" style="height:26px;width:auto;display:block;mix-blend-mode:screen;">
+    </a>
+    <div class="nav-links">
+      <a href="#about" class="nav-link"><span data-en>About</span><span data-fr style="display:none">À Propos</span></a>
+      <a href="#services" class="nav-link"><span data-en>Services</span><span data-fr style="display:none">Services</span></a>
+      <a href="#cases" class="nav-link"><span data-en>Work</span><span data-fr style="display:none">Travail</span></a>
+      <a href="#documentary" class="nav-link"><span data-en>Documentary</span><span data-fr style="display:none">Documentaire</span></a>
+      <a href="#insights" class="nav-link"><span data-en>Insights</span><span data-fr style="display:none">Insights</span></a>
+      <a href="#contact" class="nav-link"><span data-en>Contact</span><span data-fr style="display:none">Contact</span></a>
+    </div>
+    <div class="nav-right">
+      <button class="nav-lang" id="langToggle">FR</button>
+      <a href="#contact" class="btn btn-primary" style="font-size:12px;padding:9px 18px;">
+        <span data-en>Request a Diagnosis →</span>
+        <span data-fr style="display:none">Demander un Diagnostic →</span>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ─── HERO ─── -->
+<section class="hero" id="home">
+  <div style="position:absolute;inset:0;background-image:url('assets/zero-loss-image-9.jpg');background-size:120%;background-position:center 30%;filter:brightness(0.22) saturate(0.8);z-index:0;"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-orb hero-orb-1"></div>
+  <div class="hero-orb hero-orb-2"></div>
+  <div class="hero-line"></div>
+  <div class="hero-content">
+    <div>
+      <div class="hero-eyebrow-row reveal up">
+        <div class="hero-eyebrow-tag"><span data-en>Performance Transformation · Haiti & Caribbean</span><span data-fr style="display:none">Transformation de Performance · Haïti & Caraïbe</span></div>
+        <a href="#documentary" class="hero-doc-pill">
+          <div class="hero-doc-pulse"></div>
+          <span data-en>Watch Documentary</span><span data-fr style="display:none">Voir Documentaire</span>
+        </a>
+      </div>
+      <div class="hero-h reveal up delay-1">
+        <div class="t-hero" data-en>Operational<br><span class="out">Performance,</span><br>Engineered<br>for Growth.</div>
+        <div class="t-hero" data-fr style="display:none">Performance<br><span class="out">Opérationnelle,</span><br>Construite pour<br>Croître.</div>
+      </div>
+      <p class="hero-sub reveal up delay-2" data-en>Zero Loss Consulting designs and deploys the systems that allow enterprises, SMEs, NGOs and governments to produce more, waste less — and turn operational discipline into measurable economic results.</p>
+      <p class="hero-sub reveal up delay-2" data-fr style="display:none">Zero Loss Consulting conçoit et déploie les systèmes qui permettent aux entreprises, PME, ONG et gouvernements de produire plus, gaspiller moins — et transformer la discipline opérationnelle en résultats économiques mesurables.</p>
+      <p class="hero-proof reveal up delay-3" data-en>Our partners have generated $5M+ USD in cumulative revenue through Zero Loss-built systems.</p>
+      <p class="hero-proof reveal up delay-3" data-fr style="display:none">Nos partenaires ont généré plus de 5M USD de revenus cumulés grâce aux systèmes Zero Loss.</p>
+      <div class="hero-btns reveal up delay-4">
+        <a href="#contact" class="btn btn-primary"><span data-en>Request a Performance Diagnosis</span><span data-fr style="display:none">Demander un Diagnostic</span></a>
+        <a href="#services" class="btn btn-ghost"><span data-en>See How It Works ↓</span><span data-fr style="display:none">Comment ça marche ↓</span></a>
+      </div>
+    </div>
+    <div class="hero-stats reveal scale delay-2">
+      <div class="hero-stat"><div class="hs-n"><span class="counter" data-target="5">0</span>M<span class="accent">+</span></div><div class="hs-l" data-en>USD revenue generated for partners</div><div class="hs-l" data-fr style="display:none">USD revenus générés pour les partenaires</div></div>
+      <div class="hero-stat"><div class="hs-n"><span class="counter" data-target="20">0</span><span class="accent">+</span></div><div class="hs-l" data-en>Successful projects delivered</div><div class="hs-l" data-fr style="display:none">Projets réalisés avec succès</div></div>
+      <div class="hero-stat"><div class="hs-n"><span class="counter" data-target="800">0</span><span class="accent">+</span></div><div class="hs-l" data-en>Professionals trained</div><div class="hs-l" data-fr style="display:none">Professionnels formés</div></div>
+      <div class="hero-stat"><div class="hs-n"><span class="counter" data-target="5">0</span><span class="accent">+</span></div><div class="hs-l" data-en>Years of field transformation</div><div class="hs-l" data-fr style="display:none">Ans de transformation terrain</div></div>
+    </div>
+  </div>
+  <div class="hero-scroll-indicator">
+    <div class="scroll-line-wrap"><div class="scroll-line-inner"></div></div>
+    <span class="scroll-text">Scroll</span>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-wrap">
+    <div class="ticker-track">
+      <div class="ticker-item">Operational Performance <div class="ticker-dot"></div></div>
+      <div class="ticker-item">Revenue Systems <div class="ticker-dot"></div></div>
+      <div class="ticker-item">ISO · HACCP · FSSC22000 <div class="ticker-dot"></div></div>
+      <div class="ticker-item">Human Capital & Execution <div class="ticker-dot"></div></div>
+      <div class="ticker-item">Supply Chain Optimization <div class="ticker-dot"></div></div>
+      <div class="ticker-item">Haiti Talent Hub <div class="ticker-dot"></div></div>
+      <div class="ticker-item">$5M+ Generated <div class="ticker-dot"></div></div>
+      <div class="ticker-item">Performance. Systems. Growth. <div class="ticker-dot"></div></div>
+      <div class="ticker-item">Operational Performance <div class="ticker-dot"></div></div>
+      <div class="ticker-item">Revenue Systems <div class="ticker-dot"></div></div>
+      <div class="ticker-item">ISO · HACCP · FSSC22000 <div class="ticker-dot"></div></div>
+      <div class="ticker-item">Human Capital & Execution <div class="ticker-dot"></div></div>
+      <div class="ticker-item">Supply Chain Optimization <div class="ticker-dot"></div></div>
+      <div class="ticker-item">Haiti Talent Hub <div class="ticker-dot"></div></div>
+      <div class="ticker-item">$5M+ Generated <div class="ticker-dot"></div></div>
+      <div class="ticker-item">Performance. Systems. Growth. <div class="ticker-dot"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── PROBLEM ─── -->
+<section class="problem" id="about">
+  <div class="container">
+    <div>
+      <div class="eyebrow reveal left" data-en>The Problem</div>
+      <div class="eyebrow reveal left" data-fr style="display:none">Le Problème</div>
+      <div class="t-section reveal up delay-1" data-en>Most organizations<br>don't have a<br>performance problem.<br>They have a<br>system problem.</div>
+      <div class="t-section reveal up delay-1" data-fr style="display:none">La plupart des<br>organisations n'ont<br>pas un problème de<br>performance. Elles ont<br>un problème de système.</div>
+      <div class="divider reveal up delay-2"></div>
+      <p class="prob-body reveal up delay-2" data-en>Decisions made without data. Processes that live in people's heads. Growth that depends on individuals — not structure.</p>
+      <p class="prob-body reveal up delay-2" data-fr style="display:none">Des décisions sans données. Des processus dans les têtes. Une croissance qui dépend des individus — pas des systèmes.</p>
+      <p class="prob-close reveal up delay-3" data-en>Zero Loss exists to fix that.</p>
+      <p class="prob-close reveal up delay-3" data-fr style="display:none">Zero Loss existe pour changer ça.</p>
+    </div>
+    <div class="prob-items">
+      <div class="prob-item reveal right delay-1" data-en>Growth depends on a few key individuals — not on structure.</div>
+      <div class="prob-item reveal right delay-1" data-fr style="display:none">La croissance dépend de quelques individus clés — pas d'une structure.</div>
+      <div class="prob-item reveal right delay-2" data-en>Decisions are made on instinct, not data.</div>
+      <div class="prob-item reveal right delay-2" data-fr style="display:none">Les décisions se prennent à l'intuition, pas à la donnée.</div>
+      <div class="prob-item reveal right delay-3" data-en>Processes exist in people's heads, not on paper.</div>
+      <div class="prob-item reveal right delay-3" data-fr style="display:none">Les processus existent dans les têtes, pas sur papier.</div>
+      <div class="prob-item reveal right delay-4" data-en>Money is lost inside inefficiencies no one has measured yet.</div>
+      <div class="prob-item reveal right delay-4" data-fr style="display:none">De l'argent se perd dans des inefficacités que personne n'a encore mesurées.</div>
+    </div>
+  </div>
+</section>
+
+<!-- PHOTO BAND -->
+<div class="photo-band">
+  <div class="photo-cell photo-cell-1"><div class="photo-cell-bg"></div><div class="photo-ph"><div class="photo-ph-box"></div><div class="photo-ph-txt">Photo</div></div><div class="photo-overlay"><div class="photo-cap" data-en>Operational audit — manufacturing client</div><div class="photo-cap" data-fr style="display:none">Audit opérationnel — client industriel</div><div class="photo-sub" data-en>Supply Chain · Port-au-Prince</div><div class="photo-sub" data-fr style="display:none">Chaîne d'approvisionnement · Port-au-Prince</div></div></div>
+  <div class="photo-cell photo-cell-2"><div class="photo-cell-bg"></div><div class="photo-ph"><div class="photo-ph-box"></div><div class="photo-ph-txt">Photo</div></div><div class="photo-overlay"><div class="photo-cap">Haiti Talent Lab</div><div class="photo-sub">Cap-Haïtien · 2026</div></div></div>
+  <div class="photo-cell photo-cell-3"><div class="photo-cell-bg"></div><div class="photo-ph"><div class="photo-ph-box"></div><div class="photo-ph-txt">Photo</div></div><div class="photo-overlay"><div class="photo-cap" data-en>ISO 9001 Certification</div><div class="photo-cap" data-fr style="display:none">Certification ISO 9001</div><div class="photo-sub" data-en>Quality & Standards · Laverne</div><div class="photo-sub" data-fr style="display:none">Qualité & Standards · Laverne</div></div></div>
+</div>
+
+<!-- ─── SERVICES ─── -->
+<section class="build" id="services">
+  <div class="container">
+    <div class="eyebrow reveal left" data-en>What We Build</div>
+    <div class="eyebrow reveal left" data-fr style="display:none">Ce Que Nous Construisons</div>
+    <div class="t-section reveal up delay-1" data-en>We build the infrastructure<br>your organization needs<br>to perform at scale.</div>
+    <div class="t-section reveal up delay-1" data-fr style="display:none">Nous construisons l'infrastructure<br>dont votre organisation a besoin<br>pour performer à grande échelle.</div>
+    <div class="divider reveal up delay-2"></div>
+    <div class="poles">
+      <div class="pole reveal up delay-1">
+        <div class="pole-num">01</div>
+        <div class="pole-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#1B7FE0" stroke-width="1.5"><circle cx="10" cy="10" r="3"/><path d="M10 2v3M10 15v3M2 10h3M15 10h3"/><path d="M4.22 4.22l2.12 2.12M13.66 13.66l2.12 2.12M4.22 15.78l2.12-2.12M13.66 6.34l2.12-2.12"/></svg></div>
+        <div class="pole-title" data-en>Operational Performance</div>
+        <div class="pole-title" data-fr style="display:none">Performance Opérationnelle</div>
+        <div class="pole-desc" data-en>Process mapping, throughput optimization, supply chain structuring, cost leakage identification and elimination.</div>
+        <div class="pole-desc" data-fr style="display:none">Cartographie des processus, optimisation des flux, structuration de la chaîne d'approvisionnement, élimination des pertes.</div>
+        <div class="pole-tags"><span class="ptag">Process Mapping</span><span class="ptag">Supply Chain</span><span class="ptag">Dashboards</span></div>
+      </div>
+      <div class="pole reveal up delay-2">
+        <div class="pole-num">02</div>
+        <div class="pole-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#1B7FE0" stroke-width="1.5"><polyline points="18 12 12 12 10 18 8 6 6 12 2 12"/></svg></div>
+        <div class="pole-title" data-en>Revenue & Cashflow</div>
+        <div class="pole-title" data-fr style="display:none">Revenus & Cashflow</div>
+        <div class="pole-desc" data-en>Sales systems, financial modeling, performance dashboards, accounts receivable and debt recovery automation.</div>
+        <div class="pole-desc" data-fr style="display:none">Systèmes de ventes, modélisation financière, tableaux de bord, automatisation du recouvrement des créances.</div>
+        <div class="pole-tags"><span class="ptag">CRM</span><span class="ptag">Forecasting</span><span class="ptag">Recovery</span></div>
+      </div>
+      <div class="pole reveal up delay-3">
+        <div class="pole-num">03</div>
+        <div class="pole-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#1B7FE0" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <div class="pole-title" data-en>Human Capital & Execution</div>
+        <div class="pole-title" data-fr style="display:none">Capital Humain & Exécution</div>
+        <div class="pole-desc" data-en>Leadership enablement, KPI culture deployment, workforce planning, operational and managerial training programs.</div>
+        <div class="pole-desc" data-fr style="display:none">Leadership, culture KPI, planification des effectifs, programmes de formation managériale et opérationnelle.</div>
+        <div class="pole-tags"><span class="ptag">HR Systems</span><span class="ptag">KPI Culture</span><span class="ptag">Training</span></div>
+      </div>
+      <div class="pole reveal up delay-4">
+        <div class="pole-num">04</div>
+        <div class="pole-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#1B7FE0" stroke-width="1.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+        <div class="pole-title" data-en>Quality & Standards</div>
+        <div class="pole-title" data-fr style="display:none">Qualité & Standards</div>
+        <div class="pole-desc" data-en>ISO 9001, HACCP, FSSC22000, internal audits, full certification support and post-certification monitoring.</div>
+        <div class="pole-desc" data-fr style="display:none">ISO 9001, HACCP, FSSC22000, audits internes, accompagnement complet à la certification et suivi post-certification.</div>
+        <div class="pole-tags"><span class="ptag">ISO 9001</span><span class="ptag">HACCP</span><span class="ptag">Audits</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── IMPACT ─── -->
+<section class="proof-section">
+  <div class="container">
+    <div class="eyebrow light reveal left" data-en>Impact</div>
+    <div class="eyebrow light reveal left" data-fr style="display:none">Impact</div>
+    <div class="t-section light reveal up delay-1" data-en>From Engagement<br>to Impact.</div>
+    <div class="t-section light reveal up delay-1" data-fr style="display:none">De l'Engagement<br>à l'Impact.</div>
+    <div class="divider light reveal up delay-2"></div>
+    <div class="proof-nums reveal scale delay-2">
+      <div class="proof-card"><div class="proof-n">$5M<span class="c">+</span></div><div class="proof-l" data-en>Cumulative revenue generated by Zero Loss partners</div><div class="proof-l" data-fr style="display:none">Revenus cumulés générés par les partenaires Zero Loss</div></div>
+      <div class="proof-card"><div class="proof-n">20<span class="c">+</span></div><div class="proof-l" data-en>Successful projects delivered across Haiti & Caribbean</div><div class="proof-l" data-fr style="display:none">Projets réalisés avec succès en Haïti & Caraïbe</div></div>
+      <div class="proof-card"><div class="proof-n">800<span class="c">+</span></div><div class="proof-l" data-en>Professionals trained on operational excellence</div><div class="proof-l" data-fr style="display:none">Professionnels formés à l'excellence opérationnelle</div></div>
+      <div class="proof-card"><div class="proof-n">5<span class="c">+</span></div><div class="proof-l" data-en>Years of field transformation in emerging markets</div><div class="proof-l" data-fr style="display:none">Ans de transformation terrain dans les marchés émergents</div></div>
+    </div>
+    <div class="clients-lbl reveal up delay-3" data-en>They trusted Zero Loss</div>
+    <div class="clients-lbl reveal up delay-3" data-fr style="display:none">Ils ont fait confiance à Zero Loss</div>
+    <div class="clients reveal up delay-4">
+      <span class="client">HGS</span>
+      <span class="client">ZOLA</span>
+      <span class="client">Lavergne</span>
+      <span class="client">ECSSA</span>
+      <span class="client">Total Shipping Transport</span>
+      <span class="client">Novella</span>
+      <span class="client">Do it Right</span>
+      <span class="client">Coamco</span>
+      <span class="client">ILIQ</span>
+      <span class="client">CCICN</span>
+      <span class="client">FHADIRN</span>
+      <span class="client">Tropiclean S.A</span>
+      <span class="client">HATESA</span>
+      <span class="client">Fatima Group</span>
+    </div>
+  </div>
+</section>
+
+<!-- ─── DOCUMENTARY ─── -->
+<div class="doc-section" id="documentary">
+  <div class="doc-bar">
+    <div class="eyebrow light" style="margin-bottom:0" data-en>Our Documentary</div>
+    <div class="eyebrow light" style="margin-bottom:0" data-fr style="display:none">Notre Documentaire</div>
+    <div class="doc-meta">
+      <div class="doc-mi">2024 <div class="doc-ms"></div></div>
+      <div class="doc-mi">Zero Loss Consulting <div class="doc-ms"></div></div>
+      <div class="doc-mi">Haiti & Caribbean</div>
+    </div>
+  </div>
+  <div class="doc-header">
+    <div class="doc-h reveal up" data-en>We Don't<br>Just Consult.<br><em>We Document.</em></div>
+    <div class="doc-h reveal up" data-fr style="display:none">Nous ne Faisons<br>pas que Conseiller.<br><em>Nous Documentons.</em></div>
+    <div class="reveal up delay-2">
+      <p class="doc-body" data-en>Behind every system Zero Loss builds, there's a real organization, a real team, and a real transformation. This documentary captures what operational excellence actually looks like on the ground — in Haiti, where the stakes are highest.</p>
+      <p class="doc-body" data-fr style="display:none">Derrière chaque système que Zero Loss construit, il y a une organisation réelle, une équipe réelle, et une transformation réelle. Ce documentaire capture ce à quoi ressemble l'excellence opérationnelle sur le terrain.</p>
+      <div class="doc-credits">
+        <div class="doc-credit"><strong data-en>Subject</strong><strong data-fr style="display:none">Sujet</strong> · <span data-en>Operational transformation in emerging markets</span><span data-fr style="display:none">Transformation opérationnelle dans les marchés émergents</span></div>
+        <div class="doc-credit"><strong data-en>Featured</strong><strong data-fr style="display:none">En vedette</strong> · <span data-en>Zero Loss field teams & client partners</span><span data-fr style="display:none">Équipes terrain Zero Loss & partenaires clients</span></div>
+        <div class="doc-credit"><strong data-en>Location</strong><strong data-fr style="display:none">Lieu</strong> · Port-au-Prince, Cap-Haïtien, Haiti</div>
+      </div>
+      <button class="btn btn-primary" onclick="togglePlay()" type="button">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="white"><polygon points="3,1 13,7 3,13"/></svg>
+        <span data-en>Watch the Documentary</span>
+        <span data-fr style="display:none">Voir le Documentaire</span>
+      </button>
+    </div>
+  </div>
+  <div class="doc-player-wrap reveal scale">
+    <div class="doc-player">
+      <div style="position:relative;width:100%;aspect-ratio:16/9;border-radius:var(--r-lg);overflow:hidden;box-shadow:0 32px 80px rgba(4,9,15,0.8);">
+        <iframe
+          id="ytPlayer"
+          width="100%" height="100%"
+          src="https://www.youtube.com/embed/hlXI_dy8Mpg?si=jF8swE2FfgGhk3M7"
+          title="Zero Loss Consulting documentary"
+          loading="lazy"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allowfullscreen
+          style="position:absolute;inset:0;width:100%;height:100%;border:none;"
+        ></iframe>
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-top:14px;">
+        <a href="https://www.youtube.com/watch?v=hlXI_dy8Mpg" target="_blank" rel="noopener noreferrer" class="btn btn-outline-blue" style="font-size:11px;padding:10px 16px;">
+          <span data-en>Open on YouTube →</span>
+          <span data-fr style="display:none">Ouvrir sur YouTube →</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── WHO ─── -->
+<section class="who">
+  <div class="container">
+    <div class="eyebrow reveal left" data-en>Who We Work With</div>
+    <div class="eyebrow reveal left" data-fr style="display:none">Avec Qui Nous Travaillons</div>
+    <div class="t-section reveal up delay-1" data-en>Built for organizations<br>serious about performance.</div>
+    <div class="t-section reveal up delay-1" data-fr style="display:none">Conçu pour les organisations<br>sérieuses sur la performance.</div>
+    <div class="divider reveal up delay-2"></div>
+    <div class="who-grid">
+      <div class="who-card reveal up delay-1"><span class="who-badge" data-en>Large Enterprises</span><span class="who-badge" data-fr style="display:none">Grandes Entreprises</span><p class="who-text" data-en>You have scale and teams — but growth has created complexity that generates invisible losses. Zero Loss turns that complexity into a competitive advantage.</p><p class="who-text" data-fr style="display:none">Vous avez la taille et les équipes — mais la croissance a créé de la complexité qui génère des pertes invisibles. Zero Loss transforme cette complexité en avantage compétitif.</p></div>
+      <div class="who-card reveal up delay-2"><span class="who-badge">SMEs</span><p class="who-text" data-en>You have momentum. Now you need structure to grow without chaos — and scale without losing control of what you've built.</p><p class="who-text" data-fr style="display:none">Vous avez l'élan. Il vous faut maintenant la structure pour croître sans chaos — et passer à l'échelle sans perdre le contrôle.</p></div>
+      <div class="who-card reveal up delay-3"><span class="who-badge" data-en>NGOs & Int'l Organizations</span><span class="who-badge" data-fr style="display:none">ONG & Organisations Int'l</span><p class="who-text" data-en>Your mission demands results. Your funders demand accountability. Zero Loss aligns your operations with your impact objectives — and builds the systems that prove it.</p><p class="who-text" data-fr style="display:none">Votre mission exige des résultats. Vos bailleurs exigent de la redevabilité. Zero Loss aligne vos opérations sur vos objectifs d'impact.</p></div>
+      <div class="who-card reveal up delay-4"><span class="who-badge" data-en>Government & Institutions</span><span class="who-badge" data-fr style="display:none">Gouvernement & Institutions</span><p class="who-text" data-en>Limited resources, high expectations. Zero Loss designs lean, efficient systems that improve service delivery and demonstrate measurable public value.</p><p class="who-text" data-fr style="display:none">Ressources limitées, attentes élevées. Zero Loss conçoit des systèmes efficaces qui améliorent la prestation de services et démontrent une valeur publique mesurable.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── HOW IT WORKS ─── -->
+<section class="how">
+  <div class="container">
+    <div class="eyebrow reveal left" data-en>How It Works</div>
+    <div class="eyebrow reveal left" data-fr style="display:none">Comment Ça Marche</div>
+    <div class="t-section reveal up delay-1" data-en>From Diagnosis to Results<br>— in 4 Moves.</div>
+    <div class="t-section reveal up delay-1" data-fr style="display:none">Du Diagnostic aux Résultats<br>— en 4 Étapes.</div>
+    <div class="divider reveal up delay-2"></div>
+    <div class="steps reveal scale delay-2">
+      <div class="step"><div class="step-n">01</div><div class="step-t" data-en>Diagnose</div><div class="step-t" data-fr style="display:none">Diagnostiquer</div><p class="step-d" data-en>We audit operations, data flows, decision structures and execution gaps — mapping exactly where value is being lost.</p><p class="step-d" data-fr style="display:none">Nous auditons vos opérations, vos flux de données, vos structures de décision — en cartographiant exactement où la valeur se perd.</p></div>
+      <div class="step"><div class="step-n">02</div><div class="step-t" data-en>Design</div><div class="step-t" data-fr style="display:none">Concevoir</div><p class="step-d" data-en>We architect a performance system — processes, KPIs, tools, workflows — built around your context, teams and objectives.</p><p class="step-d" data-fr style="display:none">Nous architecturons un système de performance — processus, KPIs, outils — construit autour de votre contexte et vos objectifs.</p></div>
+      <div class="step"><div class="step-n">03</div><div class="step-t" data-en>Deploy</div><div class="step-t" data-fr style="display:none">Déployer</div><p class="step-d" data-en>We embed the system directly into your operations. Dashboards, protocols, accountability structures — installed and operational.</p><p class="step-d" data-fr style="display:none">Nous intégrons le système dans vos opérations. Tableaux de bord, protocoles, structures de responsabilité — installés et opérationnels.</p></div>
+      <div class="step"><div class="step-n">04</div><div class="step-t" data-en>Drive</div><div class="step-t" data-fr style="display:none">Piloter</div><p class="step-d" data-en>We track performance indicators and stay engaged until the results are real and measurable.</p><p class="step-d" data-fr style="display:none">Nous suivons les indicateurs et restons engagés jusqu'à ce que les résultats soient réels et mesurables.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── PROJECT GRID + CASE STUDIES ─── -->
+<section class="project-grid-sec" id="cases">
+  <div class="container">
+    <div class="eyebrow light reveal left" data-en>Our Work in the Field</div>
+    <div class="eyebrow light reveal left" data-fr style="display:none">Notre Travail sur le Terrain</div>
+    <div class="t-section light reveal up delay-1" data-en>Real projects.<br>Real results.</div>
+    <div class="t-section light reveal up delay-1" data-fr style="display:none">Projets réels.<br>Résultats réels.</div>
+    <div class="divider light reveal up delay-2"></div>
+    <div class="pgrid">
+      <div class="pg pg-1 large reveal left delay-1" onclick="openCase('supply-chain')"><div class="pg-img"></div><div class="pg-ph"><div class="pg-ph-box"></div><div class="pg-ph-txt">Photo / Video</div></div><div class="pg-overlay"><span class="pg-tag" data-en>Operational Performance</span><span class="pg-tag" data-fr style="display:none">Performance Opérationnelle</span><div class="pg-title" data-en>Supply Chain Restructuring</div><div class="pg-title" data-fr style="display:none">Restructuration Chaîne d'Appro</div><div class="pg-sub" data-en>Large Enterprise · Port-au-Prince</div><div class="pg-sub" data-fr style="display:none">Grande Entreprise · Port-au-Prince</div><div class="pg-hint" data-en>View Case Study →</div><div class="pg-hint" data-fr style="display:none">Voir l'Étude de Cas →</div></div></div>
+      <div class="pg pg-2 reveal up delay-2" onclick="openCase('iso')"><div class="pg-img"></div><div class="pg-ph"><div class="pg-ph-box"></div><div class="pg-ph-txt">Photo</div></div><div class="pg-overlay"><span class="pg-tag" data-en>Quality & Standards</span><span class="pg-tag" data-fr style="display:none">Qualité & Standards</span><div class="pg-title" data-en>ISO 9001 Certification</div><div class="pg-title" data-fr style="display:none">Certification ISO 9001</div><div class="pg-sub" data-en>Food & Beverage · Laverne</div><div class="pg-sub" data-fr style="display:none">Agroalimentaire · Laverne</div><div class="pg-hint" data-en>View Case Study →</div><div class="pg-hint" data-fr style="display:none">Voir l'Étude de Cas →</div></div></div>
+      <div class="pg pg-3 reveal up delay-3" onclick="openCase('talent-lab')"><div class="pg-img"></div><div class="pg-ph"><div class="pg-ph-box"></div><div class="pg-ph-txt">Photo</div></div><div class="pg-overlay"><span class="pg-tag" data-en>Human Capital</span><span class="pg-tag" data-fr style="display:none">Capital Humain</span><div class="pg-title">Haiti Talent Lab</div><div class="pg-sub" data-en>Cap-Haïtien · 200+ candidates</div><div class="pg-sub" data-fr style="display:none">Cap-Haïtien · 200+ candidats</div><div class="pg-hint" data-en>View Case Study →</div><div class="pg-hint" data-fr style="display:none">Voir l'Étude de Cas →</div></div></div>
+      <div class="pg pg-4 reveal up delay-2" onclick="openCase('padf')"><div class="pg-img"></div><div class="pg-ph"><div class="pg-ph-box"></div><div class="pg-ph-txt">Photo</div></div><div class="pg-overlay"><span class="pg-tag" data-en>Human Capital</span><span class="pg-tag" data-fr style="display:none">Capital Humain</span><div class="pg-title" data-en>Leadership Training</div><div class="pg-title" data-fr style="display:none">Formation Leadership</div><div class="pg-sub">NGO Program · PADF</div><div class="pg-hint" data-en>View Case Study →</div><div class="pg-hint" data-fr style="display:none">Voir l'Étude de Cas →</div></div></div>
+      <div class="pg pg-5 reveal up delay-3" onclick="openCase('revenue')"><div class="pg-img"></div><div class="pg-ph"><div class="pg-ph-box"></div><div class="pg-ph-txt">Photo</div></div><div class="pg-overlay"><span class="pg-tag" data-en>Revenue & Cashflow</span><span class="pg-tag" data-fr style="display:none">Revenus & Cashflow</span><div class="pg-title" data-en>Financial Systems</div><div class="pg-title" data-fr style="display:none">Systèmes Financiers</div><div class="pg-sub" data-en>SME · Revenue Generation</div><div class="pg-sub" data-fr style="display:none">PME · Génération de Revenus</div><div class="pg-hint" data-en>View Case Study →</div><div class="pg-hint" data-fr style="display:none">Voir l'Étude de Cas →</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CASE STUDY MODAL -->
+<div class="cs-overlay" id="csOverlay" onclick="handleOverlay(event)">
+  <div class="cs-modal" id="csModal">
+    <button class="cs-close" onclick="closeCase()">✕</button>
+    <div class="cs-hero"><div class="cs-hero-bg" id="csHeroBg"></div><div class="cs-hero-ov"></div><div class="cs-hero-c"><div class="cs-modal-tag" id="csTag"></div><div class="cs-modal-title" id="csTitle"></div></div></div>
+    <div class="cs-body">
+      <div class="cs-client" id="csClient"></div>
+      <div class="cs-lbl" data-en>The Challenge</div><div class="cs-lbl" data-fr style="display:none">Le Défi</div>
+      <p class="cs-text" id="csChallenge"></p>
+      <div class="cs-lbl" data-en>What Zero Loss Built</div><div class="cs-lbl" data-fr style="display:none">Ce que Zero Loss a Construit</div>
+      <div class="cs-what" id="csWhat"></div>
+      <div class="cs-lbl" data-en>The Results</div><div class="cs-lbl" data-fr style="display:none">Les Résultats</div>
+      <div class="cs-results" id="csResults"></div>
+      <div class="cs-footer"><div class="cs-footer-txt" id="csCta"></div><a href="#contact" class="btn btn-primary" onclick="closeCase()" style="font-size:11px;padding:10px 18px;"><span data-en>Work with us →</span><span data-fr style="display:none">Travailler avec nous →</span></a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── ECOSYSTEM ─── -->
+<section class="ecosystem">
+  <div class="container">
+    <div class="eyebrow light reveal left" data-en>Our Ecosystem</div>
+    <div class="eyebrow light reveal left" data-fr style="display:none">Notre Écosystème</div>
+    <div class="t-section light reveal up delay-1" data-en>Performance starts with people.</div>
+    <div class="t-section light reveal up delay-1" data-fr style="display:none">La performance commence par les personnes.</div>
+    <div class="divider light reveal up delay-2"></div>
+    <div class="talent-grid">
+      <div class="tc reveal left delay-1">
+        <span class="tc-badge" data-en>Ground Events</span><span class="tc-badge" data-fr style="display:none">Événements Terrain</span>
+        <div class="tc-h" data-en>Haiti<br>Talent Lab</div><div class="tc-h" data-fr style="display:none">Haiti<br>Talent Lab</div>
+        <p class="tc-desc" data-en>Ground-level talent events deployed across Haitian cities — identifying, mobilizing and pre-screening local professionals where they are. Each event transforms a traditional job fair into a structured, high-impact talent pipeline.</p>
+        <p class="tc-desc" data-fr style="display:none">Événements talent déployés dans les villes haïtiennes — pour identifier, mobiliser et présélectionner les professionnels locaux là où ils se trouvent.</p>
+        <div class="tc-stats">
+          <div class="ts"><div class="ts-n">200+</div><div class="ts-l" data-en>Applications collected</div><div class="ts-l" data-fr style="display:none">Candidatures recueillies</div></div>
+          <div class="ts"><div class="ts-n">100+</div><div class="ts-l" data-en>Trained on employability</div><div class="ts-l" data-fr style="display:none">Formés à l'employabilité</div></div>
+          <div class="ts"><div class="ts-n">60%+</div><div class="ts-l" data-en>Accessed interviews</div><div class="ts-l" data-fr style="display:none">Accès aux entretiens</div></div>
+          <div class="ts"><div class="ts-n">30–45%</div><div class="ts-l" data-en>Secured opportunities</div><div class="ts-l" data-fr style="display:none">Opportunités obtenues</div></div>
+        </div>
+      </div>
+      <div class="tc reveal right delay-2">
+        <span class="tc-badge" data-en>Digital Platform</span><span class="tc-badge" data-fr style="display:none">Plateforme Digitale</span>
+        <div class="tc-h" data-en>Haiti<br>Talent Hub</div><div class="tc-h" data-fr style="display:none">Haiti<br>Talent Hub</div>
+        <p class="tc-desc" data-en>A national platform centralizing pre-screened profiles, tracking professional development and connecting qualified candidates directly to employers — reducing recruitment costs, delays and risk across Haiti.</p>
+        <p class="tc-desc" data-fr style="display:none">Une plateforme nationale qui centralise les profils présélectionnés et connecte directement les candidats qualifiés aux employeurs — réduisant les coûts, les délais et les risques de recrutement.</p>
+        <div class="tc-stats">
+          <div class="ts"><div class="ts-n">200+</div><div class="ts-l" data-en>Profiles centralized</div><div class="ts-l" data-fr style="display:none">Profils centralisés</div></div>
+          <div class="ts"><div class="ts-n">100%</div><div class="ts-l" data-en>Pre-screened candidates</div><div class="ts-l" data-fr style="display:none">Candidats présélectionnés</div></div>
+          <div class="ts"><div class="ts-n">60%+</div><div class="ts-l" data-en>Interview access rate</div><div class="ts-l" data-fr style="display:none">Taux d'accès aux entretiens</div></div>
+          <div class="ts"><div class="ts-n">30–45%</div><div class="ts-l" data-en>Placement rate</div><div class="ts-l" data-fr style="display:none">Taux de placement</div></div>
+        </div>
+        <a href="https://www.haititalenthub.com" class="tc-link" target="_blank">→ haititalenthub.com</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── INSIGHTS ─── -->
+<section class="insights" id="insights">
+  <div class="container">
+    <div class="eyebrow reveal left" data-en>Insights</div>
+    <div class="eyebrow reveal left" data-fr style="display:none">Insights</div>
+    <div class="t-section reveal up delay-1" data-en>Performance is a discipline.<br>Not a slogan.</div>
+    <div class="t-section reveal up delay-1" data-fr style="display:none">La performance est une<br>discipline. Pas un slogan.</div>
+    <div class="divider reveal up delay-2"></div>
+    <div class="insights-grid">
+      <div class="ic reveal up delay-1">
+        <div class="ic-top"><span class="ic-cat" data-en>Operations</span><span class="ic-cat" data-fr style="display:none">Opérations</span></div>
+        <div class="ic-body">
+          <div class="ic-title" data-en>Why Growing Companies in Haiti Lose More Than They Gain — and How to Fix It</div>
+          <div class="ic-title" data-fr style="display:none">Pourquoi les entreprises haïtiennes en croissance perdent plus qu'elles ne gagnent</div>
+          <div class="ic-meta" data-en>5 min read · Zero Loss Consulting</div>
+          <div class="ic-meta" data-fr style="display:none">5 min de lecture · Zero Loss Consulting</div>
+          <div class="ic-read" data-en>Read Article →</div>
+          <div class="ic-read" data-fr style="display:none">Lire l'Article →</div>
+        </div>
+      </div>
+      <div class="ic reveal up delay-2">
+        <div class="ic-top"><span class="ic-cat" data-en>Leadership</span><span class="ic-cat" data-fr style="display:none">Leadership</span></div>
+        <div class="ic-body">
+          <div class="ic-title" data-en>The Difference Between a Busy Team and a High-Performance Team</div>
+          <div class="ic-title" data-fr style="display:none">La différence entre une équipe occupée et une équipe performante</div>
+          <div class="ic-meta" data-en>4 min read · Zero Loss Consulting</div>
+          <div class="ic-meta" data-fr style="display:none">4 min de lecture · Zero Loss Consulting</div>
+          <div class="ic-read" data-en>Read Article →</div>
+          <div class="ic-read" data-fr style="display:none">Lire l'Article →</div>
+        </div>
+      </div>
+      <div class="ic reveal up delay-3">
+        <div class="ic-top"><span class="ic-cat" data-en>Quality</span><span class="ic-cat" data-fr style="display:none">Qualité</span></div>
+        <div class="ic-body">
+          <div class="ic-title" data-en>ISO Certification in Haiti: Why Most Companies Fail — and What the Serious Ones Do Differently</div>
+          <div class="ic-title" data-fr style="display:none">Certification ISO en Haïti : pourquoi la plupart échouent — et ce que les sérieux font différemment</div>
+          <div class="ic-meta" data-en>6 min read · Zero Loss Consulting</div>
+          <div class="ic-meta" data-fr style="display:none">6 min de lecture · Zero Loss Consulting</div>
+          <div class="ic-read" data-en>Read Article →</div>
+          <div class="ic-read" data-fr style="display:none">Lire l'Article →</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CTA ─── -->
+<section class="cta-sec" id="contact" style="text-align:left;padding:100px 0;">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;">
+
+      <!-- LEFT — Copy -->
+      <div>
+        <div class="eyebrow light reveal left" data-en>Get Started</div>
+        <div class="eyebrow light reveal left" data-fr style="display:none">Commencer</div>
+        <div class="cta-h reveal up delay-1" style="text-align:left;margin-bottom:20px;" data-en>If your organization is growing without systems, you're leaving value on the table.</div>
+        <div class="cta-h reveal up delay-1" style="text-align:left;margin-bottom:20px;" data-fr style="display:none">Si votre organisation croît sans systèmes, vous laissez de la valeur sur la table.</div>
+        <p style="font-size:14px;color:rgba(255,255,255,0.4);line-height:1.8;margin-bottom:40px;" class="reveal up delay-2" data-en>Every week without structured operations is a week of invisible losses. The first step is a conversation.</p>
+        <p style="font-size:14px;color:rgba(255,255,255,0.4);line-height:1.8;margin-bottom:40px;" class="reveal up delay-2" data-fr style="display:none">Chaque semaine sans opérations structurées est une semaine de pertes invisibles. La première étape est une conversation.</p>
+        <div style="display:flex;flex-direction:column;gap:16px;" class="reveal up delay-3">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:36px;height:36px;border-radius:50%;background:rgba(27,127,224,0.15);border:0.5px solid rgba(27,127,224,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="var(--cyan)" stroke-width="1.5" stroke-linecap="round"><path d="M2 3h10l-5 5-5-5z"/><path d="M2 3v8h10V3"/></svg>
+            </div>
+            <a href="mailto:hey@zeroloss-ht.com" style="font-size:13px;color:rgba(255,255,255,0.6);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.6)'">hey@zeroloss-ht.com</a>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:36px;height:36px;border-radius:50%;background:rgba(27,127,224,0.15);border:0.5px solid rgba(27,127,224,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="var(--cyan)" stroke-width="1.5" stroke-linecap="round"><path d="M2 2h3l1.5 3.5-2 1.2a8 8 0 004.8 4.8l1.2-2L14 11v3a1 1 0 01-1 1A12 12 0 012 2a1 1 0 011-1h0"/></svg>
+            </div>
+            <a href="tel:+50931369595" style="font-size:13px;color:rgba(255,255,255,0.6);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.6)'">+509 3136-9595</a>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:36px;height:36px;border-radius:50%;background:rgba(27,127,224,0.15);border:0.5px solid rgba(27,127,224,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="var(--cyan)" stroke-width="1.5" stroke-linecap="round"><circle cx="7" cy="6" r="2"/><path d="M7 1C4.8 1 3 2.8 3 5c0 3 4 8 4 8s4-5 4-8c0-2.2-1.8-4-4-4z"/></svg>
+            </div>
+            <span style="font-size:13px;color:rgba(255,255,255,0.6);">Port-au-Prince, Haiti</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT — Form -->
+      <div class="reveal up delay-2">
+        <div id="formBox" style="background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.1);border-radius:var(--r-lg);padding:36px;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.03em;color:#fff;-webkit-text-stroke:0.7px #fff;margin-bottom:6px;" data-en>Request a Performance Diagnosis</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.03em;color:#fff;-webkit-text-stroke:0.7px #fff;margin-bottom:6px;display:none;" data-fr>Demander un Diagnostic de Performance</div>
+          <p style="font-size:12px;color:rgba(255,255,255,0.35);margin-bottom:28px;line-height:1.6;" data-en>We'll get back to you within 48 hours.</p>
+          <p style="font-size:12px;color:rgba(255,255,255,0.35);margin-bottom:28px;line-height:1.6;display:none;" data-fr>Nous vous répondrons dans les 48 heures.</p>
+
+          <form id="contactForm" onsubmit="submitForm(event)" style="display:flex;flex-direction:column;gap:14px;">
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div>
+                <label style="font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.35);display:block;margin-bottom:6px;" data-en>Full Name *</label>
+                <label style="font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.35);display:none;margin-bottom:6px;" data-fr>Nom Complet *</label>
+                <input type="text" name="name" required placeholder="John Smith"
+                  style="width:100%;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.12);border-radius:8px;padding:11px 14px;font-size:13px;color:#fff;font-family:'Poppins',sans-serif;outline:none;transition:border-color 0.2s;"
+                  onfocus="this.style.borderColor='rgba(27,127,224,0.6)'" onblur="this.style.borderColor='rgba(255,255,255,0.12)'">
+              </div>
+              <div>
+                <label style="font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.35);display:block;margin-bottom:6px;" data-en>Organization *</label>
+                <label style="font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.35);display:none;margin-bottom:6px;" data-fr>Organisation *</label>
+                <input type="text" name="organization" required placeholder="Company name"
+                  style="width:100%;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.12);border-radius:8px;padding:11px 14px;font-size:13px;color:#fff;font-family:'Poppins',sans-serif;outline:none;transition:border-color 0.2s;"
+                  onfocus="this.style.borderColor='rgba(27,127,224,0.6)'" onblur="this.style.borderColor='rgba(255,255,255,0.12)'">
+              </div>
+            </div>
+
+            <div>
+              <label style="font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.35);display:block;margin-bottom:6px;" data-en>Email Address *</label>
+              <label style="font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.35);display:none;margin-bottom:6px;" data-fr>Adresse Email *</label>
+              <input type="email" name="email" required placeholder="you@company.com"
+                style="width:100%;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.12);border-radius:8px;padding:11px 14px;font-size:13px;color:#fff;font-family:'Poppins',sans-serif;outline:none;transition:border-color 0.2s;"
+                onfocus="this.style.borderColor='rgba(27,127,224,0.6)'" onblur="this.style.borderColor='rgba(255,255,255,0.12)'">
+            </div>
+
+            <div>
+              <label style="font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.35);display:block;margin-bottom:6px;" data-en>Organization Type</label>
+              <label style="font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.35);display:none;margin-bottom:6px;" data-fr>Type d'Organisation</label>
+              <select name="org_type"
+                style="width:100%;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.12);border-radius:8px;padding:11px 14px;font-size:13px;color:rgba(255,255,255,0.7);font-family:'Poppins',sans-serif;outline:none;transition:border-color 0.2s;appearance:none;cursor:pointer;"
+                onfocus="this.style.borderColor='rgba(27,127,224,0.6)'" onblur="this.style.borderColor='rgba(255,255,255,0.12)'">
+                <option value="" style="background:#0B1E3F;" data-label-en="Select..." data-label-fr="Sélectionner...">Select...</option>
+                <option value="large_enterprise" style="background:#0B1E3F;" data-label-en="Large Enterprise" data-label-fr="Grande Entreprise">Large Enterprise</option>
+                <option value="sme" style="background:#0B1E3F;" data-label-en="SME" data-label-fr="PME">SME</option>
+                <option value="ngo" style="background:#0B1E3F;" data-label-en="NGO / Int'l Organization" data-label-fr="ONG / Organisation Internationale">NGO / Int'l Organization</option>
+                <option value="government" style="background:#0B1E3F;" data-label-en="Government / Institution" data-label-fr="Gouvernement / Institution">Government / Institution</option>
+              </select>
+            </div>
+
+            <div>
+              <label style="font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.35);display:block;margin-bottom:6px;" data-en>Primary Challenge</label>
+              <label style="font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.35);display:none;margin-bottom:6px;" data-fr>Défi Principal</label>
+              <select name="challenge"
+                style="width:100%;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.12);border-radius:8px;padding:11px 14px;font-size:13px;color:rgba(255,255,255,0.7);font-family:'Poppins',sans-serif;outline:none;transition:border-color 0.2s;appearance:none;cursor:pointer;"
+                onfocus="this.style.borderColor='rgba(27,127,224,0.6)'" onblur="this.style.borderColor='rgba(255,255,255,0.12)'">
+                <option value="" style="background:#0B1E3F;" data-label-en="Select..." data-label-fr="Sélectionner...">Select...</option>
+                <option value="ops" style="background:#0B1E3F;" data-label-en="Operational inefficiency" data-label-fr="Inefficacité opérationnelle">Operational inefficiency</option>
+                <option value="revenue" style="background:#0B1E3F;" data-label-en="Revenue & cashflow issues" data-label-fr="Problèmes de revenus et trésorerie">Revenue & cashflow issues</option>
+                <option value="people" style="background:#0B1E3F;" data-label-en="Team performance & execution" data-label-fr="Performance d'équipe et exécution">Team performance & execution</option>
+                <option value="quality" style="background:#0B1E3F;" data-label-en="Quality & compliance" data-label-fr="Qualité et conformité">Quality & compliance</option>
+                <option value="scale" style="background:#0B1E3F;" data-label-en="Scaling & growth" data-label-fr="Croissance et passage à l'échelle">Scaling & growth</option>
+                <option value="other" style="background:#0B1E3F;" data-label-en="Other" data-label-fr="Autre">Other</option>
+              </select>
+            </div>
+
+            <div>
+              <label style="font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.35);display:block;margin-bottom:6px;" data-en>Briefly describe your situation</label>
+              <label style="font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.35);display:none;margin-bottom:6px;" data-fr>Décrivez brièvement votre situation</label>
+              <textarea name="message" rows="3" placeholder="Tell us what's happening..."
+                style="width:100%;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.12);border-radius:8px;padding:11px 14px;font-size:13px;color:#fff;font-family:'Poppins',sans-serif;outline:none;transition:border-color 0.2s;resize:vertical;min-height:80px;"
+                onfocus="this.style.borderColor='rgba(27,127,224,0.6)'" onblur="this.style.borderColor='rgba(255,255,255,0.12)'"></textarea>
+            </div>
+
+            <button type="submit" id="submitBtn"
+              style="width:100%;background:var(--blue);color:#fff;border:none;border-radius:8px;padding:13px;font-size:13px;font-weight:600;font-family:'Poppins',sans-serif;cursor:pointer;letter-spacing:0.04em;transition:all 0.3s;box-shadow:0 4px 24px rgba(27,127,224,0.3);"
+              onmouseover="this.style.background='#1570c8';this.style.transform='translateY(-2px)'"
+              onmouseout="this.style.background='var(--blue)';this.style.transform='none'">
+              <span data-en>Request a Performance Diagnosis →</span>
+              <span data-fr style="display:none">Demander un Diagnostic de Performance →</span>
+            </button>
+
+          </form>
+        </div>
+
+        <!-- Success state -->
+        <div id="formSuccess" style="display:none;background:rgba(255,255,255,0.04);border:0.5px solid rgba(27,127,224,0.3);border-radius:var(--r-lg);padding:48px 36px;text-align:center;">
+          <div style="width:56px;height:56px;border-radius:50%;background:rgba(27,127,224,0.15);border:1px solid rgba(27,127,224,0.4);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="var(--cyan)" stroke-width="2" stroke-linecap="round"><path d="M4 11l5 5L18 6"/></svg>
+          </div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:0.03em;color:#fff;-webkit-text-stroke:0.7px #fff;margin-bottom:10px;" data-en>Message Sent.</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:0.03em;color:#fff;-webkit-text-stroke:0.7px #fff;margin-bottom:10px;display:none;" data-fr>Message Envoyé.</div>
+          <p style="font-size:13px;color:rgba(255,255,255,0.45);line-height:1.7;" data-en>We'll get back to you within 48 hours at the email address you provided.</p>
+          <p style="font-size:13px;color:rgba(255,255,255,0.45);line-height:1.7;display:none;" data-fr>Nous vous répondrons dans les 48 heures à l'adresse email que vous avez fournie.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer style="background:#020811;border-top:0.5px solid rgba(255,255,255,0.06);">
+
+  <!-- Top divider line -->
+  <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(27,127,224,0.4),transparent);"></div>
+
+  <!-- Main footer content -->
+  <div style="max-width:1200px;margin:0 auto;padding:56px 52px 0;">
+
+    <!-- Logo + tagline row -->
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:40px;margin-bottom:48px;padding-bottom:40px;border-bottom:0.5px solid rgba(255,255,255,0.07);">
+      <div style="max-width:280px;">
+        <img src="assets/zero-loss-image-10.png" alt="Zero Loss Consulting" style="height:72px;width:auto;mix-blend-mode:screen;display:block;margin-bottom:16px;">
+        <p style="font-size:12px;color:rgba(255,255,255,0.28);line-height:1.7;" data-en>Transforming operational performance into measurable economic results — across Haiti and the Caribbean.</p>
+        <p style="font-size:12px;color:rgba(255,255,255,0.28);line-height:1.7;display:none;" data-fr>Transformer la performance opérationnelle en résultats économiques mesurables — en Haïti et dans la Caraïbe.</p>
+      </div>
+      <!-- Tagline / stat highlight -->
+      <div style="text-align:right;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,4vw,52px);letter-spacing:0.01em;line-height:0.9;color:#fff;-webkit-text-stroke:1px #fff;">$5M<span style="color:var(--cyan);-webkit-text-stroke:1px var(--cyan);">+</span></div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:6px;" data-en>Revenue generated for partners</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:6px;display:none;" data-fr>Revenus générés pour les partenaires</div>
+      </div>
+    </div>
+
+    <!-- Links grid -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:32px;margin-bottom:48px;" class="footer-links-grid">
+      <div>
+        <div style="font-size:10px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:rgba(255,255,255,0.2);margin-bottom:16px;" data-en>Navigation</div>
+        <div style="font-size:10px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:rgba(255,255,255,0.2);margin-bottom:16px;display:none;" data-fr>Navigation</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <a href="#about" style="font-size:13px;color:rgba(255,255,255,0.4);text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.4)'" data-en>About</a>
+          <a href="#about" style="font-size:13px;color:rgba(255,255,255,0.4);text-decoration:none;transition:color .2s;display:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.4)'" data-fr>À Propos</a>
+          <a href="#services" style="font-size:13px;color:rgba(255,255,255,0.4);text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.4)'" data-en>Services</a>
+          <a href="#services" style="font-size:13px;color:rgba(255,255,255,0.4);text-decoration:none;transition:color .2s;display:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.4)'" data-fr>Services</a>
+          <a href="#cases" style="font-size:13px;color:rgba(255,255,255,0.4);text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.4)'" data-en>Work</a>
+          <a href="#cases" style="font-size:13px;color:rgba(255,255,255,0.4);text-decoration:none;transition:color .2s;display:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.4)'" data-fr>Travail</a>
+          <a href="#documentary" style="font-size:13px;color:rgba(255,255,255,0.4);text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.4)'" data-en>Documentary</a>
+          <a href="#documentary" style="font-size:13px;color:rgba(255,255,255,0.4);text-decoration:none;transition:color .2s;display:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.4)'" data-fr>Documentaire</a>
+          <a href="#insights" style="font-size:13px;color:rgba(255,255,255,0.4);text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">Insights</a>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:rgba(255,255,255,0.2);margin-bottom:16px;" data-en>Services</div>
+        <div style="font-size:10px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:rgba(255,255,255,0.2);margin-bottom:16px;display:none;" data-fr>Services</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <a href="#services" style="font-size:13px;color:rgba(255,255,255,0.4);text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.4)'" data-en>Operational Performance</a>
+          <a href="#services" style="font-size:13px;color:rgba(255,255,255,0.4);text-decoration:none;transition:color .2s;display:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.4)'" data-fr>Performance Opérationnelle</a>
+          <a href="#services" style="font-size:13px;color:rgba(255,255,255,0.4);text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.4)'" data-en>Revenue & Cashflow</a>
+          <a href="#services" style="font-size:13px;color:rgba(255,255,255,0.4);text-decoration:none;transition:color .2s;display:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.4)'" data-fr>Revenus & Cashflow</a>
+          <a href="#services" style="font-size:13px;color:rgba(255,255,255,0.4);text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.4)'" data-en>Human Capital</a>
+          <a href="#services" style="font-size:13px;color:rgba(255,255,255,0.4);text-decoration:none;transition:color .2s;display:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.4)'" data-fr>Capital Humain</a>
+          <a href="#services" style="font-size:13px;color:rgba(255,255,255,0.4);text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.4)'" data-en>Quality & Standards</a>
+          <a href="#services" style="font-size:13px;color:rgba(255,255,255,0.4);text-decoration:none;transition:color .2s;display:none;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.4)'" data-fr>Qualité & Standards</a>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:rgba(255,255,255,0.2);margin-bottom:16px;" data-en>Ecosystem</div>
+        <div style="font-size:10px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:rgba(255,255,255,0.2);margin-bottom:16px;display:none;" data-fr>Écosystème</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <a href="#cases" style="font-size:13px;color:rgba(255,255,255,0.4);text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">Haiti Talent Lab</a>
+          <a href="https://www.haititalenthub.com" target="_blank" style="font-size:13px;color:rgba(255,255,255,0.4);text-decoration:none;transition:color .2s;" onmouseover="this.style.color='var(--cyan)'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">Haiti Talent Hub ↗</a>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:rgba(255,255,255,0.2);margin-bottom:16px;" data-en>Contact</div>
+        <div style="font-size:10px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:rgba(255,255,255,0.2);margin-bottom:16px;display:none;" data-fr>Contact</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <a href="mailto:hey@zeroloss-ht.com" style="font-size:12px;color:rgba(255,255,255,0.4);text-decoration:none;transition:color .2s;" onmouseover="this.style.color='var(--cyan)'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">hey@zeroloss-ht.com</a>
+          <a href="tel:+50931369595" style="font-size:12px;color:rgba(255,255,255,0.4);text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">+509 3136-9595</a>
+          <span style="font-size:12px;color:rgba(255,255,255,0.28);">Port-au-Prince, Haiti</span>
+          <a href="https://www.zeroloss-ht.com" target="_blank" style="font-size:12px;color:rgba(255,255,255,0.4);text-decoration:none;transition:color .2s;" onmouseover="this.style.color='var(--cyan)'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">www.zeroloss-ht.com</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom bar -->
+  <div style="border-top:0.5px solid rgba(255,255,255,0.06);">
+    <div style="max-width:1200px;margin:0 auto;padding:18px 52px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+      <div style="font-size:11px;color:rgba(255,255,255,0.18);" data-en>© 2024 Zero Loss Consulting S.A. All rights reserved.</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.18);display:none;" data-fr>© 2024 Zero Loss Consulting S.A. Tous droits réservés.</div>
+      <div style="display:flex;gap:20px;">
+        <a href="mailto:hey@zeroloss-ht.com?subject=Privacy%20Policy%20Request" style="font-size:11px;color:rgba(255,255,255,0.18);text-decoration:none;transition:color .2s;" onmouseover="this.style.color='rgba(255,255,255,0.5)'" onmouseout="this.style.color='rgba(255,255,255,0.18)'" data-en>Privacy Policy</a>
+        <a href="mailto:hey@zeroloss-ht.com?subject=Demande%20Politique%20de%20Confidentialit%C3%A9" style="font-size:11px;color:rgba(255,255,255,0.18);text-decoration:none;transition:color .2s;display:none;" onmouseover="this.style.color='rgba(255,255,255,0.5)'" onmouseout="this.style.color='rgba(255,255,255,0.18)'" data-fr>Politique de Confidentialité</a>
+        <a href="mailto:hey@zeroloss-ht.com?subject=Terms%20Request" style="font-size:11px;color:rgba(255,255,255,0.18);text-decoration:none;transition:color .2s;" onmouseover="this.style.color='rgba(255,255,255,0.5)'" onmouseout="this.style.color='rgba(255,255,255,0.18)'" data-en>Terms</a>
+        <a href="mailto:hey@zeroloss-ht.com?subject=Demande%20Conditions" style="font-size:11px;color:rgba(255,255,255,0.18);text-decoration:none;transition:color .2s;display:none;" onmouseover="this.style.color='rgba(255,255,255,0.5)'" onmouseout="this.style.color='rgba(255,255,255,0.18)'" data-fr>Conditions</a>
+      </div>
+    </div>
+  </div>
+
+</footer>
+
+<script>
+const FORM_ENDPOINT = '';
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const customCursorEnabled = window.matchMedia('(hover: hover) and (pointer: fine)').matches && !prefersReducedMotion;
+
+// ─── LOADER ───
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('loader').classList.add('done');
+    initCounters();
+  }, 1600);
+});
+
+// ─── CURSOR ───
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+const dot = document.getElementById('cursorDot');
+let mx = 0, my = 0, rx = 0, ry = 0;
+
+if (customCursorEnabled) {
+  document.body.classList.add('custom-cursor');
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    dot.style.transform = `translate(${mx}px, ${my}px) translate(-50%,-50%)`;
+  });
+
+  function animateCursor() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.transform = `translate(${rx}px, ${ry}px) translate(-50%,-50%)`;
+    requestAnimationFrame(animateCursor);
+  }
+  animateCursor();
+
+  document.querySelectorAll('a, button, .pg, .pole, .who-card, .step, .client, .ic, .tc').forEach(el => {
+    el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+    el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+  });
+} else if (cursor) {
+  cursor.style.display = 'none';
+}
+
+// ─── SCROLL ANIMATIONS ───
+const revealObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); }
+  });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+
+// ─── NAV ───
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 40);
+  document.getElementById('scrollTop').classList.toggle('show', window.scrollY > 500);
+  // Active nav
+  const sections = document.querySelectorAll('section[id], div[id]');
+  let current = '';
+  sections.forEach(s => { if (window.scrollY >= s.offsetTop - 80) current = s.id; });
+  document.querySelectorAll('.nav-link').forEach(l => {
+    l.classList.remove('active');
+    if (l.getAttribute('href') === '#' + current) l.classList.add('active');
+  });
+});
+
+// ─── LANGUAGE ───
+let isFR = false;
+document.getElementById('langToggle').addEventListener('click', () => {
+  isFR = !isFR;
+  document.body.classList.toggle('fr', isFR);
+  document.getElementById('langToggle').textContent = isFR ? 'EN' : 'FR';
+  document.querySelectorAll('[data-en]').forEach(el => el.style.display = isFR ? 'none' : '');
+  document.querySelectorAll('[data-fr]').forEach(el => el.style.display = isFR ? '' : 'none');
+  updateSelectLabels();
+});
+
+function updateSelectLabels() {
+  const key = isFR ? 'labelFr' : 'labelEn';
+  document.querySelectorAll('option[data-label-en]').forEach(option => {
+    option.textContent = option.dataset[key];
+  });
+}
+updateSelectLabels();
+
+// ─── COUNTERS ───
+function initCounters() {
+  document.querySelectorAll('.counter').forEach(el => {
+    const target = parseInt(el.dataset.target);
+    let current = 0;
+    const step = target / 40;
+    const timer = setInterval(() => {
+      current = Math.min(current + step, target);
+      el.textContent = Math.floor(current);
+      if (current >= target) clearInterval(timer);
+    }, 30);
+  });
+}
+
+// ─── CONTACT FORM ───
+async function submitForm(e) {
+  e.preventDefault();
+  const btn = document.getElementById('submitBtn');
+  const form = document.getElementById('contactForm');
+  const success = document.getElementById('formSuccess');
+  const box = document.getElementById('formBox');
+
+  const originalButton = btn.innerHTML;
+  btn.textContent = isFR ? 'Envoi...' : 'Sending...';
+  btn.style.opacity = '0.7';
+  btn.disabled = true;
+
+  const data = new FormData(form);
+  const body = Object.fromEntries(data.entries());
+
+  try {
+    if (!FORM_ENDPOINT) {
+      throw new Error('Form endpoint is not configured');
+    }
+
+    const res = await fetch(FORM_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(body)
+    });
+
+    if (res.ok) {
+      box.style.display = 'none';
+      success.style.display = 'block';
+    } else {
+      throw new Error('Network error');
+    }
+  } catch (err) {
+    // Fallback — open mailto
+    const subject = encodeURIComponent('Performance Diagnosis Request — ' + (body.organization || ''));
+    const msg = encodeURIComponent(
+      `Name: ${body.name}\nOrganization: ${body.organization}\nEmail: ${body.email}\nType: ${body.org_type}\nChallenge: ${body.challenge}\n\n${body.message}`
+    );
+    window.location.href = `mailto:hey@zeroloss-ht.com?subject=${subject}&body=${msg}`;
+  } finally {
+    btn.innerHTML = originalButton;
+    btn.disabled = false;
+    btn.style.opacity = '1';
+  }
+}
+function togglePlay() {
+  const iframe = document.getElementById('ytPlayer');
+  if (iframe) {
+    iframe.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    iframe.focus();
+  }
+}
+
+// ─── CASE STUDY DATA ───
+const cases = {
+  'supply-chain': {
+    tag:{en:'Operational Performance',fr:'Performance Opérationnelle'},
+    title:{en:'Supply Chain Restructuring',fr:'Restructuration Chaîne d\'Appro'},
+    bg:'linear-gradient(135deg,#091a35,#0f2444)',
+    client:{en:'<span>Client</span> · Large Distribution Enterprise <div class="cs-sep"></div> <span>Location</span> · Port-au-Prince <div class="cs-sep"></div> <span>Duration</span> · 6 months',fr:'<span>Client</span> · Grande Entreprise de Distribution <div class="cs-sep"></div> <span>Durée</span> · 6 mois'},
+    challenge:{en:'A large distribution enterprise was experiencing significant operational losses due to unstructured supply chain processes, lack of inventory visibility, and misaligned procurement cycles — directly impacting revenue and delivery timelines.',fr:'Une grande entreprise de distribution subissait des pertes opérationnelles importantes dues à des processus non structurés, un manque de visibilité des stocks et des cycles d\'approvisionnement mal alignés.'},
+    what:{en:['Mapped end-to-end supply chain and identified 7 critical leakage points','Redesigned procurement and inventory management workflows','Deployed real-time KPI dashboard for operations leadership','Trained operations team on new process protocols'],fr:['Cartographie de bout en bout et identification de 7 points de perte critiques','Refonte des flux de gestion des achats et des stocks','Déploiement d\'un tableau de bord KPI en temps réel','Formation de l\'équipe aux nouveaux protocoles']},
+    results:[{n:'40%',l:{en:'Reduction in order processing time',fr:'Réduction du temps de traitement'}},{n:'$800K+',l:{en:'Operational cost savings identified',fr:'Économies opérationnelles identifiées'}},{n:'3×',l:{en:'Inventory visibility improvement',fr:'Amélioration visibilité stocks'}}],
+    cta:{en:'<strong>Operational Performance</strong> · Zero Loss Consulting',fr:'<strong>Performance Opérationnelle</strong> · Zero Loss Consulting'}
+  },
+  'iso': {
+    tag:{en:'Quality & Standards',fr:'Qualité & Standards'},
+    title:{en:'ISO 9001 Certification',fr:'Certification ISO 9001'},
+    bg:'linear-gradient(135deg,#060f1e,#0d1c35)',
+    client:{en:'<span>Client</span> · Laverne — Food & Beverage <div class="cs-sep"></div> <span>Standard</span> · ISO 9001 / HACCP <div class="cs-sep"></div> <span>Scope</span> · Full certification',fr:'<span>Client</span> · Laverne — Agroalimentaire <div class="cs-sep"></div> <span>Standard</span> · ISO 9001 / HACCP'},
+    challenge:{en:'Laverne needed to achieve ISO 9001 certification to access new market partnerships and demonstrate quality compliance to international buyers. Existing quality processes were informal and lacked documented standards.',fr:'Laverne devait obtenir la certification ISO 9001 pour accéder à de nouveaux partenariats. Leurs processus qualité existants étaient informels et manquaient de standards documentés.'},
+    what:{en:['Full quality management system gap analysis','Designed and documented all ISO 9001 procedures and work instructions','Implemented HACCP food safety protocols across production lines','Internal audit cycles and preparation training for all staff','Accompanied client through official certification audit'],fr:['Analyse des écarts du système de management de la qualité','Conception et documentation de toutes les procédures ISO 9001','Mise en place des protocoles HACCP sur les lignes de production','Cycles d\'audit interne et formation à la préparation du personnel']},
+    results:[{n:'✓',l:{en:'ISO 9001 certification achieved',fr:'Certification ISO 9001 obtenue'}},{n:'100%',l:{en:'Staff trained on quality standards',fr:'Personnel formé aux standards qualité'}},{n:'0',l:{en:'Major non-conformities at audit',fr:'Non-conformités majeures à l\'audit'}}],
+    cta:{en:'<strong>Quality & Standards</strong> · Zero Loss Consulting',fr:'<strong>Qualité & Standards</strong> · Zero Loss Consulting'}
+  },
+  'talent-lab': {
+    tag:{en:'Human Capital & Execution',fr:'Capital Humain & Exécution'},
+    title:{en:'Haiti Talent Lab — Cap-Haïtien',fr:'Haiti Talent Lab — Cap-Haïtien'},
+    bg:'linear-gradient(135deg,#081626,#0b1d3a)',
+    client:{en:'<span>Program</span> · Haiti Talent Lab <div class="cs-sep"></div> <span>Location</span> · Cap-Haïtien <div class="cs-sep"></div> <span>Date</span> · March 2026',fr:'<span>Programme</span> · Haiti Talent Lab <div class="cs-sep"></div> <span>Lieu</span> · Cap-Haïtien <div class="cs-sep"></div> <span>Date</span> · Mars 2026'},
+    challenge:{en:'The northern Haitian labor market lacked a structured mechanism to connect qualified local talent with employers. Recruitment processes were slow and unstructured, with no system to retain talent locally.',fr:'Le marché du travail du nord d\'Haïti manquait d\'un mécanisme structuré. Les processus de recrutement étaient lents et non structurés, sans système pour retenir les talents locaux.'},
+    what:{en:['Designed and deployed a structured talent pre-screening methodology','Organized ground-level talent mobilization event in Cap-Haïtien','Built and delivered employability preparation program','Created operational foundation for Haiti Talent Hub digital platform','Established employer partnership pipeline for direct placement'],fr:['Conception et déploiement d\'une méthodologie de présélection structurée','Organisation d\'un événement de mobilisation des talents à Cap-Haïtien','Programme de préparation à l\'employabilité pour les candidats présélectionnés','Fondation opérationnelle pour la plateforme digitale Haiti Talent Hub']},
+    results:[{n:'200+',l:{en:'Applications collected',fr:'Candidatures recueillies'}},{n:'60%+',l:{en:'Candidates accessed interviews',fr:'Candidats en entretien'}},{n:'30–45%',l:{en:'Secured a professional opportunity',fr:'Opportunité professionnelle obtenue'}}],
+    cta:{en:'<strong>Haiti Talent Hub</strong> · haititalenthub.com',fr:'<strong>Haiti Talent Hub</strong> · haititalenthub.com'}
+  },
+  'padf': {
+    tag:{en:'Human Capital & Execution',fr:'Capital Humain & Exécution'},
+    title:{en:'Leadership & Org. Development',fr:'Leadership & Développement Org.'},
+    bg:'linear-gradient(135deg,#0a1828,#071220)',
+    client:{en:'<span>Client</span> · PADF / ECCSA <div class="cs-sep"></div> <span>Type</span> · NGO / International Organization <div class="cs-sep"></div> <span>Scope</span> · Org. Development',fr:'<span>Client</span> · PADF / ECCSA <div class="cs-sep"></div> <span>Type</span> · ONG / Organisation Internationale'},
+    challenge:{en:'PADF and ECCSA needed to strengthen the management capacity of their local teams and build a performance culture aligned with international standards — while adapting to the Haitian organizational context.',fr:'PADF et ECCSA devaient renforcer la capacité managériale de leurs équipes locales et construire une culture de performance alignée sur les standards internationaux.'},
+    what:{en:['Conducted leadership capacity assessment across management tiers','Designed customized leadership development curriculum','Delivered training program to 40+ staff members','Built internal KPI framework and accountability reporting structure','Established performance review cycle and coaching protocols'],fr:['Évaluation de la capacité de leadership à tous les niveaux','Conception d\'un curriculum de développement du leadership personnalisé','Programme de formation pour 40+ membres du personnel','Cadre KPI interne et structure de reporting de responsabilité']},
+    results:[{n:'40+',l:{en:'Staff trained on leadership & KPIs',fr:'Personnel formé leadership & KPIs'}},{n:'100%',l:{en:'Teams equipped with KPI frameworks',fr:'Équipes équipées de cadres KPI'}},{n:'↑',l:{en:'Program accountability improved',fr:'Redevabilité d\'impact améliorée'}}],
+    cta:{en:'<strong>Human Capital & Execution</strong> · Zero Loss Consulting',fr:'<strong>Capital Humain & Exécution</strong> · Zero Loss Consulting'}
+  },
+  'revenue': {
+    tag:{en:'Revenue & Cashflow',fr:'Revenus & Cashflow'},
+    title:{en:'Financial Systems — SME',fr:'Systèmes Financiers — PME'},
+    bg:'linear-gradient(135deg,#0c1e38,#091628)',
+    client:{en:'<span>Client</span> · Haiti Green Solutions / ZOLA Clean <div class="cs-sep"></div> <span>Type</span> · SME · Sustainability <div class="cs-sep"></div> <span>Scope</span> · Revenue & Cashflow',fr:'<span>Client</span> · Haiti Green Solutions / ZOLA Clean <div class="cs-sep"></div> <span>Type</span> · PME · Durabilité'},
+    challenge:{en:'Growing SMEs were generating revenue but lacked financial systems to control, forecast, and scale it. Receivables were untracked, cash flow unpredictable, and decisions relied on estimates rather than data.',fr:'Des PME en croissance généraient des revenus mais manquaient des systèmes financiers pour les contrôler. Les créances non suivies, flux de trésorerie imprévisibles.'},
+    what:{en:['Mapped revenue flows and identified cashflow leakage points','Structured accounts receivable tracking and recovery process','Built financial forecasting model and monthly reporting framework','Deployed revenue performance dashboard for management','Implemented pricing review and margin optimization'],fr:['Cartographie des flux de revenus et identification des points de fuite','Structuration du suivi des créances et du processus de recouvrement','Modèle de prévision financière et cadre de reporting mensuel','Tableau de bord de performance des revenus pour la direction']},
+    results:[{n:'$5M+',l:{en:'Cumulative revenue across Zero Loss partners',fr:'Revenus cumulés des partenaires Zero Loss'}},{n:'↓',l:{en:'Receivables aging reduced significantly',fr:'Âge des créances réduit significativement'}},{n:'↑',l:{en:'Revenue predictability & cashflow control',fr:'Prévisibilité des revenus & contrôle'}}],
+    cta:{en:'<strong>Revenue & Cashflow</strong> · Zero Loss Consulting',fr:'<strong>Revenus & Cashflow</strong> · Zero Loss Consulting'}
+  }
+};
+
+const lang = () => document.body.classList.contains('fr') ? 'fr' : 'en';
+
+function openCase(id) {
+  const c = cases[id]; const l = lang();
+  document.getElementById('csHeroBg').style.background = c.bg;
+  document.getElementById('csTag').textContent = c.tag[l];
+  document.getElementById('csTitle').textContent = c.title[l];
+  document.getElementById('csClient').innerHTML = c.client[l];
+  document.getElementById('csChallenge').textContent = c.challenge[l];
+  document.getElementById('csWhat').innerHTML = c.what[l].map(w => `<div class="cs-what-item"><div class="cs-what-dot"></div><span>${w}</span></div>`).join('');
+  document.getElementById('csResults').innerHTML = c.results.map(r => `<div class="cs-rc"><div class="cs-rn">${r.n}</div><div class="cs-rl">${r.l[l]}</div></div>`).join('');
+  document.getElementById('csCta').innerHTML = c.cta[l];
+  document.getElementById('csOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  document.body.classList.remove('custom-cursor');
+}
+
+function closeCase() {
+  document.getElementById('csOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+  if (customCursorEnabled) document.body.classList.add('custom-cursor');
+}
+
+function handleOverlay(e) {
+  if (e.target === document.getElementById('csOverlay')) closeCase();
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCase(); });
+
+document.querySelectorAll('.pg[onclick]').forEach(card => {
+  card.setAttribute('role', 'button');
+  card.setAttribute('tabindex', '0');
+  card.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      card.click();
+    }
+  });
+});
+</script>
+</body>
+</html>
